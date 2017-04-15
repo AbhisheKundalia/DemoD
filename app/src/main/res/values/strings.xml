@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">Shri Ram</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_logout">Logout</string>
+
+    <string name="backdrop_title">LOVE MUSIC</string>
+    <string name="backdrop_subtitle">This season top 20 albums</string>
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string name="category1">Rings</string>
+    <string name="category2">Bangles</string>
+    <string name="category3">Chains</string>
+    <string name="category4">Necklace</string>
+
+    <string-array name="nav_item_activity_titles">
+        <item>Palakh Jewellers - Rings</item>
+        <item>Bangles</item>
+        <item>Chain</item>
+        <item>Notifications</item>
+        <item>Settings</item>
+    </string-array>
+</resources>

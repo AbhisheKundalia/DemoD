@@ -1,0 +1,8 @@
+<resources>
+    <item name="ic_category1" type="drawable">@android:drawable/ic_menu_camera</item>
+    <item name="ic_category2" type="drawable">@android:drawable/ic_menu_gallery</item>
+    <item name="ic_category3" type="drawable">@android:drawable/ic_menu_slideshow</item>
+    <item name="ic_category4" type="drawable">@android:drawable/ic_menu_manage</item>
+    <item name="ic_menu_share" type="drawable">@android:drawable/ic_menu_share</item>
+    <item name="ic_menu_send" type="drawable">@android:drawable/ic_menu_send</item>
+</resources>
