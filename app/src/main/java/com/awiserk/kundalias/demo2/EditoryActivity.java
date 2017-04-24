@@ -153,6 +153,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             //Mandatory to refresh image from Uri.
             //getImageView().setImageURI(null);
             mUri = r.getUri();
+            mItemHasChanged = true;
             //Setting the real returned image.
             updateImage(mUri);
 
@@ -192,10 +193,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * SetImage into the Image view by cleaning up the existing data
      */
     private void updateImage(Uri imageUri) {
-        mItemCardView.setAlpha(1.0f);
-        mItemlabelTextView.setVisibility(View.GONE);
-        mItemImageView.setPadding(0, 0, 0, 0);
-        mItemImageView.setImageURI(imageUri);
+        if (mItemHasChanged) {
+            mItemCardView.setAlpha(1.0f);
+            mItemlabelTextView.setVisibility(View.GONE);
+            mItemImageView.setPadding(0, 0, 0, 0);
+            mItemImageView.setImageURI(imageUri);
+        }
     }
 
     /**
