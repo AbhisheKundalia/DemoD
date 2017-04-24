@@ -40,10 +40,10 @@ public class FragList3 extends android.support.v4.app.Fragment {
         rv = (RecyclerView) rootview.findViewById(R.id.list3_rv);
 
         //Layout Manager
-        rv.setLayoutManager(new GridLayoutManager(this.getActivity(), 2));
+        rv.setLayoutManager(new GridLayoutManager(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity())));
 
         //Decorator and animator add with 10 spacing in DP
-        rv.addItemDecoration(new GridSpacingItemDecorator(this.getActivity(), 2, 10, true));
+        rv.addItemDecoration(new GridSpacingItemDecorator(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity()), 10, true));
         rv.setItemAnimator(new DefaultItemAnimator());
 
         //Adapter

@@ -1,13 +1,16 @@
 package com.awiserk.kundalias.demo2.mFragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 
 import com.awiserk.kundalias.demo2.Data.DataProvider;
 import com.awiserk.kundalias.demo2.MyItemRecyclerViewAdapter;
@@ -44,14 +47,15 @@ public class FragList1 extends android.support.v4.app.Fragment {
         rv = (RecyclerView) rootview.findViewById(R.id.list1_rv);
 
         //Layout Manager
-        rv.setLayoutManager(new GridLayoutManager(this.getActivity(), 2));
+        rv.setLayoutManager(new GridLayoutManager(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity())));
 
         //Decorator and animator add with 10 spacing in DP
-        rv.addItemDecoration(new GridSpacingItemDecorator(this.getActivity(), 2, 10, true));
+        rv.addItemDecoration(new GridSpacingItemDecorator(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity()), 10, true));
         rv.setItemAnimator(new DefaultItemAnimator());
 
         //Adapter
         rv.setAdapter(new MyItemRecyclerViewAdapter(getActivity(), DataProvider.getITEMS()));
         return rootview;
     }
+
 }

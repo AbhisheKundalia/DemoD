@@ -359,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgNavHeaderBg);
 
+
         // Loading profile image
         Glide.with(this).load(DataProvider.getUrlProfileImg())
                 .listener(new RequestListener<String, GlideDrawable>() {
