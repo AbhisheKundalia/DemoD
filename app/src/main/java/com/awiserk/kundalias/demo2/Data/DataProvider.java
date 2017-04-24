@@ -17,10 +17,18 @@ public class DataProvider {
      * An array of sample (dummy) items.
      */
     public static final List<Item> ITEMS = new ArrayList<Item>();
+    /**
+     * Possible values for the categories of the item.
+     */
+    public static final int CATEGORY_UNKNOWN = 0;
+    public static final int CATEGORY_1 = 1;
+    public static final int CATEGORY_2 = 2;
+    public static final int CATEGORY_3 = 3;
+    public static final int CATEGORY_4 = 4;
     // urls to load navigation header background image
     // and profile image
-    private static final String urlNavHeaderBg = "http://api.androidhive.info/images/nav-menu-header-bg.jpg";
-    private static final String urlProfileImg = "https://lh3.googleusercontent.com/eCtE_G34M9ygdkmOpYvCag1vBARCmZwnVS6rS5t4JLzJ6QgQSBquM0nuTsCpLhYbKljoyS-txg";
+    private static final String urlNavHeaderBg = "https://scontent.fblr2-1.fna.fbcdn.net/v/t1.0-9/17155643_604619189727656_6470350059459558370_n.jpg?oh=1cbf62b6ed6d76c6e18e81449ec21aee&oe=5981EFD8";
+    private static final String urlProfileImg = "https://scontent.fblr2-1.fna.fbcdn.net/v/t1.0-9/17155643_604619189727656_6470350059459558370_n.jpg?oh=1cbf62b6ed6d76c6e18e81449ec21aee&oe=5981EFD8";
     private static final String userName = "Abhishek Kundalia";
     private static final String userEmail = "abhishekundalia@gmail.com";
     private static final String cat1CoverImg = "https://img.clipartfox.com/6a7ba8a6429e1b6ae50adb34acee6957_nature-google-the-vineyard-google-clipart-nature_1600-1200.jpeg";
