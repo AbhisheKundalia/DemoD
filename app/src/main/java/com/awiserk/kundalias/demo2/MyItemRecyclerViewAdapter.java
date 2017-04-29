@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.awiserk.kundalias.demo2.Data.DataProvider;
+import com.awiserk.kundalias.demo2.data.DataProvider;
 
 import java.util.List;
 

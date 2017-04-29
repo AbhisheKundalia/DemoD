@@ -23,8 +23,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.awiserk.kundalias.demo2.Data.DataProvider;
-import com.awiserk.kundalias.demo2.Utils.CircleTransform;
+import com.awiserk.kundalias.demo2.data.DataProvider;
+import com.awiserk.kundalias.demo2.utils.CircleTransform;
 import com.awiserk.kundalias.demo2.mFragments.FragList1;
 import com.awiserk.kundalias.demo2.mFragments.FragList2;
 import com.awiserk.kundalias.demo2.mFragments.FragList3;

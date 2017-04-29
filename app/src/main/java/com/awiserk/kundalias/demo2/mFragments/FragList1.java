@@ -1,21 +1,18 @@
 package com.awiserk.kundalias.demo2.mFragments;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
 
-import com.awiserk.kundalias.demo2.Data.DataProvider;
+import com.awiserk.kundalias.demo2.data.DataProvider;
 import com.awiserk.kundalias.demo2.MyItemRecyclerViewAdapter;
 import com.awiserk.kundalias.demo2.R;
-import com.awiserk.kundalias.demo2.Utils.GridSpacingItemDecorator;
+import com.awiserk.kundalias.demo2.utils.GridSpacingItemDecorator;
 
 /**
  * Created by Abhishek on 4/12/2017.

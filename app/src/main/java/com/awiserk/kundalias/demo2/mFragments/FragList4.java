@@ -9,10 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.awiserk.kundalias.demo2.Data.DataProvider;
+import com.awiserk.kundalias.demo2.data.DataProvider;
 import com.awiserk.kundalias.demo2.MyItemRecyclerViewAdapter;
 import com.awiserk.kundalias.demo2.R;
-import com.awiserk.kundalias.demo2.Utils.GridSpacingItemDecorator;
+import com.awiserk.kundalias.demo2.utils.GridSpacingItemDecorator;
 
 /**
  * Created by Abhishek on 4/12/2017.

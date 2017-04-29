@@ -1,4 +1,4 @@
-package com.awiserk.kundalias.demo2.Utils;
+package com.awiserk.kundalias.demo2.utils;
 
 import android.content.Context;
 import android.content.res.Resources;

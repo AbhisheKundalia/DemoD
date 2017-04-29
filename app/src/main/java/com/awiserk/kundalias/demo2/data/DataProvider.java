@@ -1,4 +1,4 @@
-package com.awiserk.kundalias.demo2.Data;
+package com.awiserk.kundalias.demo2.data;
 
 import com.awiserk.kundalias.demo2.R;
 

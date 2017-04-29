@@ -17,11 +17,12 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.awiserk.kundalias.demo2.Data.DataProvider;
+import com.awiserk.kundalias.demo2.data.DataProvider;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -29,8 +30,6 @@ import com.vansuita.pickimage.listeners.IPickResult;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
-    private static final int CAMERA_REQUEST = 1888;
-    private static final int RC_PHOTO_PICKER = 2;
     Uri mUri;
     /**
      * Card Image View to hold each Item
@@ -56,6 +55,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * EditText field to enter the item Price
      */
     private EditText mItemCostEditText;
+    /**
+     * Linearlayout block field to enter the item Size Checkbox
+     */
+    private LinearLayout mItemSizeCheckboxLinearLayout;
     /**
      * EditText field to enter the item Size1
      */
@@ -108,6 +111,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemCategorySpinner = (Spinner) findViewById(R.id.spinner_category);
         mItemIdEditText = (EditText) findViewById(R.id.input_id);
         mItemCostEditText = (EditText) findViewById(R.id.input_price);
+        mItemSizeCheckboxLinearLayout = (LinearLayout) findViewById(R.id.checkbox_ll);
         mItemSize1Checkbox = (CheckBox) findViewById(R.id.checkbox_size1);
         mItemSize2Checkbox = (CheckBox) findViewById(R.id.checkbox_size2);
         mItemSize3Checkbox = (CheckBox) findViewById(R.id.checkbox_size3);
@@ -224,6 +228,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.category1))) {
                         mCategory = DataProvider.CATEGORY_1;
+                        CheckBox cb = new CheckBox(getApplicationContext());
+                        cb.setText("I'm dynamic!");
+                        mItemSizeCheckboxLinearLayout.addView(cb);
                     } else if (selection.equals(getString(R.string.category2))) {
                         mCategory = DataProvider.CATEGORY_2;
                     } else if (selection.equals(getString(R.string.category3))) {
