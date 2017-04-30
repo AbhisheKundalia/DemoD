@@ -40,7 +40,7 @@ public final class ItemContract {
 
     public static final String PATH_CHAINS = "chains";
 
-    public static final String PATH_NECKLACE = "necklace";
+    public static final String PATH_NECKLACES = "necklaces";
 
     /**
      * Inner class that defines constant values for the items database table.
@@ -48,7 +48,7 @@ public final class ItemContract {
      */
     public static final class ItemEntry implements BaseColumns {
 
-        /** The content URI to access the ring data in the provider */
+        /** The content URI to access the All sizes data in the provider */
         public static final Uri ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_ALL_SIZES);
 
         /** The content URI to access the ring data in the provider */
@@ -70,10 +70,10 @@ public final class ItemContract {
         public static final Uri CHAINS_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_CHAINS);
 
         /** The content URI to access the necklace data in the provider */
-        public static final Uri NECKLACE_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NECKLACE);
+        public static final Uri NECKLACE_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NECKLACES);
 
         /** The content URI to access the ring sizes data in the provider */
-        public static final Uri NECKLACE_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_NECKLACE);
+        public static final Uri NECKLACE_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_NECKLACES);
 
 
 
