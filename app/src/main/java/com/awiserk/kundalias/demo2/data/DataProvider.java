@@ -49,6 +49,13 @@ public class DataProvider {
             R.drawable.album7,
             R.drawable.album8,
     };
+    public static String[] ringsSizes = new String[]{"xl","abc", "asd", "adf"};
+
+    public static String[] banglesSizes = new String[]{"xjbl","abc", "asd", "adf", "asdf", "efw23"};
+
+    public static String[] chainsSizes = new String[]{"xl","abc", "asd", "adf", "asewe2", "q"};
+
+    public static String[] necklaceSizes = new String[]{"xl","abc", "asd", "adf"};
 
     static {
         // Add some sample items.
@@ -97,7 +104,7 @@ public class DataProvider {
     }
 
     private static Item createDummyItem(int position) {
-        return new Item(String.valueOf(position), (int) (position * 0.8 + 7), covers[position]);
+        return new Item(String.valueOf(position), (int) (position * 1000000 + 7), covers[position]);
     }
 
     public static List<Item> getITEMS() {

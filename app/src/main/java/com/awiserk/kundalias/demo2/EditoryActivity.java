@@ -23,10 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.awiserk.kundalias.demo2.data.DataProvider;
+import com.awiserk.kundalias.demo2.utils.NumberTextWatcherForThousand;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
 import com.vansuita.pickimage.listeners.IPickResult;
+
+import java.lang.reflect.Array;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
@@ -59,23 +62,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * Linearlayout block field to enter the item Size Checkbox
      */
     private LinearLayout mItemSizeCheckboxLinearLayout;
-    /**
-     * EditText field to enter the item Size1
-     */
-    private CheckBox mItemSize1Checkbox;
-    /**
-     * EditText field to enter the item Size2
-     */
-    private CheckBox mItemSize2Checkbox;
-    /**
-     * EditText field to enter the item Size3
-     */
-    private CheckBox mItemSize3Checkbox;
-    /**
-     * EditText field to enter the item Size4
-     */
-    private CheckBox mItemSize4Checkbox;
-    /**
+     /**
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
      */
     private boolean mItemHasChanged = false;
@@ -112,10 +99,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemIdEditText = (EditText) findViewById(R.id.input_id);
         mItemCostEditText = (EditText) findViewById(R.id.input_price);
         mItemSizeCheckboxLinearLayout = (LinearLayout) findViewById(R.id.checkbox_ll);
-        mItemSize1Checkbox = (CheckBox) findViewById(R.id.checkbox_size1);
-        mItemSize2Checkbox = (CheckBox) findViewById(R.id.checkbox_size2);
-        mItemSize3Checkbox = (CheckBox) findViewById(R.id.checkbox_size3);
-        mItemSize4Checkbox = (CheckBox) findViewById(R.id.checkbox_size4);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -124,10 +107,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemCategorySpinner.setOnTouchListener(mTouchListener);
         mItemIdEditText.setOnTouchListener(mTouchListener);
         mItemCostEditText.setOnTouchListener(mTouchListener);
-        mItemSize1Checkbox.setOnTouchListener(mTouchListener);
-        mItemSize2Checkbox.setOnTouchListener(mTouchListener);
-        mItemSize3Checkbox.setOnTouchListener(mTouchListener);
-        mItemSize4Checkbox.setOnTouchListener(mTouchListener);
+        mItemCostEditText.addTextChangedListener(new NumberTextWatcherForThousand(mItemCostEditText));
 
 
         //Loads the already set image on device rotation
@@ -228,15 +208,18 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.category1))) {
                         mCategory = DataProvider.CATEGORY_1;
-                        CheckBox cb = new CheckBox(getApplicationContext());
-                        cb.setText("I'm dynamic!");
-                        mItemSizeCheckboxLinearLayout.addView(cb);
+                        addSizesCheckbox(DataProvider.ringsSizes);
+
                     } else if (selection.equals(getString(R.string.category2))) {
                         mCategory = DataProvider.CATEGORY_2;
+                        addSizesCheckbox(DataProvider.banglesSizes);
+
                     } else if (selection.equals(getString(R.string.category3))) {
                         mCategory = DataProvider.CATEGORY_3;
-                    } else if (selection.equals(getString(R.string.category2))) {
+                        addSizesCheckbox(DataProvider.chainsSizes);
+                    } else if (selection.equals(getString(R.string.category4))) {
                         mCategory = DataProvider.CATEGORY_4;
+                        addSizesCheckbox(DataProvider.necklaceSizes);
                     } else {
                         mCategory = DataProvider.CATEGORY_UNKNOWN;
                     }
@@ -251,6 +234,23 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         });
     }
 
+    private void addSizesCheckbox(String[] sizes)
+    {
+        int arrayLength = Array.getLength(sizes);
+        if(mItemSizeCheckboxLinearLayout.getChildCount() > 0)
+            mItemSizeCheckboxLinearLayout.removeAllViews();
+        if(arrayLength > 0)
+        {
+            for(int i = 0; i < arrayLength; i++)
+            {
+                CheckBox cb = new CheckBox(getApplicationContext());
+                cb.setText(sizes[i]);
+                mItemSizeCheckboxLinearLayout.addView(cb);
+                cb.setOnTouchListener(mTouchListener);
+            }
+        }
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.

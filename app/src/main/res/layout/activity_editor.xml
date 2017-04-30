@@ -146,6 +146,7 @@
                 <EditText
                     android:id="@+id/input_price"
                     style="@style/EditorFieldStyle"
+                    android:maxLength="13"
                     android:hint="@string/hint_item_price"
                     android:inputType="number" />
 
@@ -186,29 +187,6 @@
                     android:paddingTop="8dp"
                     android:weightSum="1">
 
-                    <CheckBox
-                        android:id="@+id/checkbox_size1"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/size1" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_size2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/size2" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_size3"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/size3" />
-
-                    <CheckBox
-                        android:id="@+id/checkbox_size4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/size4" />
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>

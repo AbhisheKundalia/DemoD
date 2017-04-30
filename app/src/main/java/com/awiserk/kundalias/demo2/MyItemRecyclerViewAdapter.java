@@ -1,6 +1,7 @@
 package com.awiserk.kundalias.demo2;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,8 +31,9 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+
         holder.image.setImageResource(items.get(position).getThumbnail());
-        holder.cost.setText(items.get(position).getCost());
+        holder.cost.setText(c.getString(R.string.unit_item_price)+" "+items.get(position).getCost());
         holder.id.setText(items.get(position).getId());
     }
 

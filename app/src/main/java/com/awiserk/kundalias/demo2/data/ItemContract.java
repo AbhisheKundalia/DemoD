@@ -32,6 +32,8 @@ public final class ItemContract {
      * looking at ring data. content://com.example.android.items/staff/ will fail,
      * as the ContentProvider hasn't been given any information on what to do with "staff".
      */
+    public static final String PATH_ALL_SIZES = "allsizes";
+
     public static final String PATH_RINGS = "rings";
 
     public static final String PATH_BANGLES = "bangles";
@@ -47,17 +49,36 @@ public final class ItemContract {
     public static final class ItemEntry implements BaseColumns {
 
         /** The content URI to access the ring data in the provider */
+        public static final Uri ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_ALL_SIZES);
+
+        /** The content URI to access the ring data in the provider */
         public static final Uri RINGS_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_RINGS);
+
+        /** The content URI to access the ring sizes data in the provider */
+        public static final Uri RINGS_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_RINGS);
 
         /** The content URI to access the bangle data in the provider */
         public static final Uri BANGLES_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_BANGLES);
 
+        /** The content URI to access the ring sizes data in the provider */
+        public static final Uri BANGLES_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_BANGLES);
+
         /** The content URI to access the chains data in the provider */
         public static final Uri CHAINS_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_CHAINS);
+
+        /** The content URI to access the ring sizes data in the provider */
+        public static final Uri CHAINS_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_CHAINS);
 
         /** The content URI to access the necklace data in the provider */
         public static final Uri NECKLACE_CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NECKLACE);
 
+        /** The content URI to access the ring sizes data in the provider */
+        public static final Uri NECKLACE_ALL_SIZES_CONTENT_URI = Uri.withAppendedPath(ALL_SIZES_CONTENT_URI, PATH_NECKLACE);
+
+
+
+        /** Name of database table for ALL SIZES */
+        public final static String ALLSIZES_TABLE_NAME = "allsizes";
 
         /** Name of database table for rings */
         public final static String RINGS_TABLE_NAME = "rings";
@@ -94,14 +115,11 @@ public final class ItemContract {
         public final static String COLUMN_ITEM_PRICE = "price";
 
         /**
-         * Sizes of the item.
-         *
-         * The only possible values are {@link #SIZE_30}, {@link #SIZE_32},{@link #SIZE_34},
-         * or {@link #SIZE_36}.
+         * Available Sizes of the item.
          *
          * Type: INTEGER
          */
-        public final static String COLUMN_ITEM_SIZES = "sizes";
+        public final static String COLUMN_ITEM_AVAILABLE_SIZES = "sizes";
 
         /**
          * Image of the ITEM.
@@ -110,13 +128,6 @@ public final class ItemContract {
          */
         public final static String COLUMN_ITEM_IMAGE = "image";
 
-        /**
-         * Possible values for the sizes of the item.
-         */
-        public static final int SIZE_30 = 30;
-        public static final int SIZE_32 = 32;
-        public static final int SIZE_34 = 34;
-        public static final int SIZE_36 = 36;
     }
 
 }
