@@ -49,8 +49,14 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_alignParentRight">true</item>
         <item name="android:paddingRight">16dp</item>
-        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingTop">12dp</item>
         <item name="android:textAppearance">?android:textAppearanceMedium</item>
+    </style>
+
+    <!-- Style for the measurement units for an EditText field in the editor -->
+    <style name="ErrorText">
+        <item name="android:textAppearance">@style/TextAppearance.Design.Error</item>
+        <item name="android:textColor">@color/textinput_error_color_light</item>
     </style>
 
 </resources>

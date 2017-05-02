@@ -13,4 +13,6 @@
     <!-- Primary dark color for the editor -->
     <color name="editorColorPrimaryDark">#394450</color>
 
+    <color name="textinput_error_color_light">#FFD50000</color>
+
 </resources>

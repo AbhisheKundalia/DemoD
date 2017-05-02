@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -33,7 +34,7 @@ import java.lang.reflect.Array;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
-    Uri mUri;
+    Uri mImageUri;
     /**
      * Card Image View to hold each Item
      */
@@ -61,7 +62,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     /**
      * Linearlayout block field to enter the item Size Checkbox
      */
-    private LinearLayout mItemSizeCheckboxLinearLayout;
+    private LinearLayout mItemSizeCheckboxTextInputLayout;
      /**
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
      */
@@ -71,7 +72,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private Uri mCurrentItemUri;
 
-    private int mCategory = DataProvider.CATEGORY_UNKNOWN;
+    private String mCategory;
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -91,6 +92,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
+        mCategory = getString(R.string.category_unknown);
+
         // Find all relevant views that we will need to read user input from
         mItemCardView = (CardView) findViewById(R.id.card_image_view);
         mItemImageView = (ImageView) findViewById(R.id.select_imagebutton);
@@ -98,7 +101,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemCategorySpinner = (Spinner) findViewById(R.id.spinner_category);
         mItemIdEditText = (EditText) findViewById(R.id.input_id);
         mItemCostEditText = (EditText) findViewById(R.id.input_price);
-        mItemSizeCheckboxLinearLayout = (LinearLayout) findViewById(R.id.checkbox_ll);
+        mItemSizeCheckboxTextInputLayout = (LinearLayout) findViewById(R.id.checkbox_ll);
 
         // Setup OnTouchListeners on all the input fields, so we can determine if the user
         // has touched or modified them. This will let us know if there are unsaved changes
@@ -112,9 +115,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
         //Loads the already set image on device rotation
         if (savedInstanceState != null) {
-            mUri = savedInstanceState.getParcelable("uri");
+            mImageUri = savedInstanceState.getParcelable("uri");
             mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
-            updateImage(mUri);
+            updateImage(mImageUri);
         }
 
         // ImagePickerButton shows an image picker to upload a image for a message
@@ -136,10 +139,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             //If you want the Uri.
             //Mandatory to refresh image from Uri.
             //getImageView().setImageURI(null);
-            mUri = r.getUri();
+            mImageUri = r.getUri();
             mItemHasChanged = true;
             //Setting the real returned image.
-            updateImage(mUri);
+            updateImage(mImageUri);
 
             //If you want the Bitmap.
             //mItemImageView.setImageBitmap(r.getBitmap());
@@ -156,8 +159,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     // Saves the state of image selected on device rotation
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (mUri != null && mItemHasChanged != false) {
-            outState.putParcelable("uri", mUri);
+        if (mImageUri != null && mItemHasChanged != false) {
+            outState.putParcelable("uri", mImageUri);
             outState.putBoolean("itemChanged", mItemHasChanged);
         }
         super.onSaveInstanceState(outState);
@@ -168,9 +171,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         super.onRestoreInstanceState(savedInstanceState);
         // Restore UI state from the savedInstanceState.
         // This bundle has also been passed to onCreate.
-        mUri = savedInstanceState.getParcelable("uri");
+        mImageUri = savedInstanceState.getParcelable("uri");
         mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
-        updateImage(mUri);
+        updateImage(mImageUri);
     }
 
     /**
@@ -207,21 +210,21 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.category1))) {
-                        mCategory = DataProvider.CATEGORY_1;
+                        mCategory = getString(R.string.category1);
                         addSizesCheckbox(DataProvider.ringsSizes);
 
                     } else if (selection.equals(getString(R.string.category2))) {
-                        mCategory = DataProvider.CATEGORY_2;
+                        mCategory = getString(R.string.category2);
                         addSizesCheckbox(DataProvider.banglesSizes);
 
                     } else if (selection.equals(getString(R.string.category3))) {
-                        mCategory = DataProvider.CATEGORY_3;
+                        mCategory = getString(R.string.category3);
                         addSizesCheckbox(DataProvider.chainsSizes);
                     } else if (selection.equals(getString(R.string.category4))) {
-                        mCategory = DataProvider.CATEGORY_4;
+                        mCategory = getString(R.string.category4);
                         addSizesCheckbox(DataProvider.necklaceSizes);
                     } else {
-                        mCategory = DataProvider.CATEGORY_UNKNOWN;
+                        mCategory = getString(R.string.category_unknown);
                     }
                 }
             }
@@ -229,7 +232,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             // Because AdapterView is an abstract class, onNothingSelected must be defined
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mCategory = DataProvider.CATEGORY_UNKNOWN;
+                mCategory = getString(R.string.category_unknown);
             }
         });
     }
@@ -237,19 +240,113 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     private void addSizesCheckbox(String[] sizes)
     {
         int arrayLength = Array.getLength(sizes);
-        if(mItemSizeCheckboxLinearLayout.getChildCount() > 0)
-            mItemSizeCheckboxLinearLayout.removeAllViews();
+        if(mItemSizeCheckboxTextInputLayout.getChildCount() > 0)
+            mItemSizeCheckboxTextInputLayout.removeAllViews();
         if(arrayLength > 0)
         {
             for(int i = 0; i < arrayLength; i++)
             {
                 CheckBox cb = new CheckBox(getApplicationContext());
                 cb.setText(sizes[i]);
-                mItemSizeCheckboxLinearLayout.addView(cb);
+                mItemSizeCheckboxTextInputLayout.addView(cb);
                 cb.setOnTouchListener(mTouchListener);
             }
         }
 
+    }
+
+    /**
+     * Get user input from editor and save item into database.
+     */
+    private void saveItem() {
+        // Read from input fields
+        // Use trim to eliminate leading or trailing white space
+        //String imageURLString = mImageUri.toString();
+        String itemIdString = mItemIdEditText.getText().toString().trim();
+        //Trims the visible commas of the price
+        String itemCostString = NumberTextWatcherForThousand.trimCommaOfString(mItemCostEditText.getText().toString()).trim();
+
+        TextInputLayout tilPrice = (TextInputLayout) findViewById(R.id.text_input_layout_price);
+        // and check if all the fields in the editor are blank and display error
+        if (TextUtils.isEmpty(itemCostString))
+        {
+            tilPrice.setError("This field can not be blank");
+        }
+
+        TextInputLayout tilId = (TextInputLayout) findViewById(R.id.text_input_layout_id);
+        // and check if all the fields in the editor are blank and display error
+        if (TextUtils.isEmpty(itemIdString))
+        {
+            tilId.setError("This field can not be blank");
+        }
+        //TextInputLayout tilCategory = (TextInputLayout) findViewById(R.id.text_input_layout_category);
+        // and check if all the fields in the editor are blank and display error
+        //tilCategory.setError("This field can not be blank");
+       // mItemSizeCheckboxTextInputLayout.setError("select one check box atleast");
+
+
+        /*if (TextUtils.isEmpty(imageURLString))
+        {
+            mItemImageView.
+        }
+                TextUtils.isEmpty(itemIdString) && mCategory == getString(R.string.category_unknown)) {
+
+            if (itemCostString.equalsIgnoreCase("")) {
+                mItemCostEditText.setError("This field can not be blank");
+            }*/
+            // Since no fields were modified, we can return early without creating a new pet.
+            // No need to create ContentValues and no need to do any ContentProvider operations.
+
+
+
+        /*// Create a ContentValues object where column names are the keys,
+        // and pet attributes from the editor are the values.
+        ContentValues values = new ContentValues();
+        values.put(PetEntry.COLUMN_PET_NAME, nameString);
+        values.put(PetEntry.COLUMN_PET_BREED, breedString);
+        values.put(PetEntry.COLUMN_PET_GENDER, mGender);
+        // If the weight is not provided by the user, don't try to parse the string into an
+        // integer value. Use 0 by default.
+        int weight = 0;
+        if (!TextUtils.isEmpty(weightString)) {
+            weight = Integer.parseInt(weightString);
+        }
+        values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
+
+        // Determine if this is a new or existing pet by checking if mCurrentPetUri is null or not
+        if (mCurrentPetUri == null) {
+            // This is a NEW pet, so insert a new pet into the provider,
+            // returning the content URI for the new pet.
+            Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+
+            // Show a toast message depending on whether or not the insertion was successful.
+            if (newUri == null) {
+                // If the new content URI is null, then there was an error with insertion.
+                Toast.makeText(this, getString(R.string.editor_insert_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Otherwise this is an EXISTING pet, so update the pet with content URI: mCurrentPetUri
+            // and pass in the new ContentValues. Pass in null for the selection and selection args
+            // because mCurrentPetUri will already identify the correct row in the database that
+            // we want to modify.
+            int rowsAffected = getContentResolver().update(mCurrentPetUri, values, null, null);
+
+            // Show a toast message depending on whether or not the update was successful.
+            if (rowsAffected == 0) {
+                // If no rows were affected, then there was an error with the update.
+                Toast.makeText(this, getString(R.string.editor_update_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the update was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_update_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }*/
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -282,8 +379,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             case R.id.action_save:
                 // Save Item to database
                 //TODO saveItem();
+                saveItem();
                 // Exit activity
-                finish();
+                //finish();
                 return true;
             // Respond to a click on the "Delete" menu option
             case R.id.action_delete:

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Layout for the editor -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -61,39 +62,50 @@
                         android:text="@string/label_addimage" />
 
                 </RelativeLayout>
-
             </android.support.v7.widget.CardView>
+            <TextView
+                android:id="@+id/image_error_view"
+                style="@style/ErrorText"
+                android:layout_width="wrap_content"
+                android:paddingBottom="4dp"
+                android:layout_height="wrap_content"
+                android:text=""
+                 />
+
         </LinearLayout>
 
         <!-- Item Category Section -->
-        <LinearLayout
+    <LinearLayout
             android:id="@+id/add_container_category"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="@dimen/input_container_height"
             android:orientation="horizontal">
 
             <!-- Label -->
             <TextView
                 style="@style/CategoryStyle"
-                android:text="@string/label_category" />
+                android:text="@string/label_category"
+                android:layout_height="match_parent"/>
+
 
             <!-- Input field -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:layout_weight="2"
-                android:orientation="vertical">
-
+                android:paddingLeft="4dp">
                 <!-- Category drop-down spinner -->
                 <Spinner
                     android:id="@+id/spinner_category"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
                     android:paddingRight="16dp"
                     android:spinnerMode="dropdown" />
             </LinearLayout>
-        </LinearLayout>
 
+        </LinearLayout>
         <!-- Id Section -->
         <LinearLayout
             android:id="@+id/add_container_id"
@@ -104,6 +116,7 @@
             <!-- Label -->
             <TextView
                 style="@style/CategoryStyle"
+                android:layout_height="match_parent"
                 android:text="@string/label_id" />
 
             <!-- Input fields -->
@@ -114,11 +127,22 @@
                 android:paddingLeft="4dp">
 
                 <!-- Id Input field -->
-                <EditText
-                    android:id="@+id/input_id"
-                    style="@style/EditorFieldStyle"
-                    android:hint="@string/hint_item_name"
-                    android:inputType="text" />
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/text_input_layout_id"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:errorEnabled="true"
+                    app:hintEnabled='false'>
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_id"
+                        style="@style/EditorFieldStyle"
+                        android:layout_height="match_parent"
+                        android:hint="@string/hint_item_name"
+                        android:inputType="text" />
+
+                </android.support.design.widget.TextInputLayout>
+
             </RelativeLayout>
 
         </LinearLayout>
@@ -133,7 +157,8 @@
             <!-- Label -->
             <TextView
                 style="@style/CategoryStyle"
-                android:text="@string/label_price" />
+                android:text="@string/label_price"
+                android:layout_height="match_parent"/>
 
             <!-- Cost Input fields -->
             <RelativeLayout
@@ -143,12 +168,21 @@
                 android:paddingLeft="4dp">
 
                 <!-- cost Input field -->
-                <EditText
-                    android:id="@+id/input_price"
-                    style="@style/EditorFieldStyle"
-                    android:maxLength="13"
-                    android:hint="@string/hint_item_price"
-                    android:inputType="number" />
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/text_input_layout_price"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:errorEnabled="true"
+                    app:hintEnabled='false'>
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/input_price"
+                        style="@style/EditorFieldStyle"
+                        android:hint="@string/hint_item_price"
+                        android:inputType="number"
+                        android:maxLength="13" />
+
+                </android.support.design.widget.TextInputLayout>
 
                 <!-- Units for weight (kg) -->
                 <TextView
@@ -170,7 +204,8 @@
             <!-- Label -->
             <TextView
                 style="@style/CategoryStyle"
-                android:text="@string/label_size" />
+                android:text="@string/label_size"
+                android:layout_height="@dimen/input_container_height"/>
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -178,13 +213,12 @@
                 android:layout_weight="2"
                 android:paddingLeft="4dp">
 
-                <!-- Size Input fields -->
                 <LinearLayout
                     android:id="@+id/checkbox_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingTop="8dp"
+                    android:paddingTop="16dp"
                     android:weightSum="1">
 
                 </LinearLayout>

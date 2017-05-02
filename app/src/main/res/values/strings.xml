@@ -77,4 +77,5 @@
         <item>@string/category4</item>
     </string-array>
     <string name="title_activity_editory">EditoryActivity</string>
+    <string name="category_unknown">UNKNOWN</string>
 </resources>
