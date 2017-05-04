@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.awiserk.kundalias.demo2.data.DataProvider;
+import com.awiserk.kundalias.demo2.data.Item;
 import com.awiserk.kundalias.demo2.utils.EventListenerForSanityCheck;
 import com.awiserk.kundalias.demo2.utils.NumberTextWatcherForThousand;
 import com.vansuita.pickimage.bean.PickResult;
@@ -37,8 +39,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
+    //Error Code for each field
+    final int ERROR_IMAGE = 0;
+    final int ERROR_ID = 1;
+    final int ERROR_PRICE = 2;
+    final int ERROR_SIZES = 3;
+    final boolean[] initError = new boolean[]{false, false, false, false};
+    final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
     int savecounter = 0;
-
     Uri mImageUri = null;
     /**
      * Card Image View to hold each Item
@@ -52,6 +60,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * TextView Label to add Image
      */
     private TextView mItemImagelabelTextView;
+    /**
+     * Linearlayout block field to enter the item Size Checkbox
+     */
+    //private LinearLayout mItemSizeCheckboxLinearLayout;
     /**
      * TextView Label to display Image Error
      */
@@ -77,10 +89,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private TextInputLayout mItemPriceErrorTextInputLayout;
     /**
-     * Linearlayout block field to enter the item Size Checkbox
-     */
-    //private LinearLayout mItemSizeCheckboxLinearLayout;
-    /**
      * TextInputLayout to display Item Price error
      */
     private TextInputLayout mItemSizeErrorTextInputLayout;
@@ -88,7 +96,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
      */
     private boolean mItemHasChanged = false;
-
     private String mCategory;
     /**
      * CheckBox array to reference to all the checkboxes
@@ -102,19 +109,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * stores all the available sizes based on user selection
      */
     private ArrayList<String> availableSizes = null;
-
-
     private Menu menu = null;
-
     private boolean isSaveMenuItemEnabled = true;
-    //Error Code for each field
-    final int ERROR_IMAGE = 0;
-    final int ERROR_ID = 1;
-    final int ERROR_PRICE = 2;
-    final int ERROR_SIZES = 3;
-    final boolean[] initError = new boolean[]{false, false, false, false};
-    final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
-
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
@@ -123,6 +119,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
             mItemHasChanged = true;
+
             return false;
         }
     };
@@ -306,7 +303,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 cb[i] = new CheckBox(getApplicationContext());
                 cb[i].setText(sizes[i]);
                 mItemSizeErrorTextInputLayout.addView(cb[i]);
-                cb[i].setOnTouchListener(mTouchListener);
+                mItemSizeErrorTextInputLayout.setOnTouchListener(mTouchListener);
             }
         }
 
@@ -339,30 +336,58 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     }
 
 
+    /**
+     * This method checks if Image is selected or not
+     *
+     * @return true if image is selected and false if image is not selected
+     */
     public boolean isImageSelected() {
         //Check if image is selected else display error message
         if (mImageUri == null) {
             mItemImageErrorTextView.setText(getString(R.string.error_image));
             return false;
-        }
-        else
-        {
+        } else {
             mItemImageErrorTextView.setText(null);
             return true;
         }
 
     }
+
+
+    /**
+     * This method Check if any of the checkbox is selected
+     *
+     * @return true if atleast single checkbox is selectd and false if no checkbox is selected
+     */
+    public boolean isCheckboxSelected() {
+        //check if single checkbox is selected
+        for (int i = 0; i < arrayLength; i++) {
+            if (cb[i].isChecked()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * This method performs data sanity check on all the input fields and diplays error with listener
      * Returns the Item object created of clear data
      */
     public boolean sanityCheckInputData() {
 
-
+        /**
+         * OnTouchListener that listens for any user touches on a Checkbox, implying that they are modifying
+         * the checkboxes, and we set the error accordingly
+         */
+        CheckBox.OnCheckedChangeListener mCheckboxTouchListener = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                initError[ERROR_SIZES] = !isCheckboxSelected();
+                error.setBoo(initError);
+            }
+        };
 
         //Set event listener for value to check if there is no error and enable save button
-
-
         error.setListener(new EventListenerForSanityCheck.ChangeListener() {
             @Override
             public void onError() {
@@ -375,6 +400,14 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             public void onNoError() {
                 setEnabled(menu.findItem(R.id.action_save));
                 Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCheckboxError(boolean isClean) {
+                if (isClean)
+                    mItemSizeErrorTextInputLayout.setError(null);
+                else
+                    mItemSizeErrorTextInputLayout.setError(getString(R.string.error_size));
             }
         });
 
@@ -468,43 +501,14 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         initError[ERROR_IMAGE] = !isImageSelected();
         error.setBoo(initError);
 
-
-/*
-
-        if(mItemIdErrorTextInputLayout.getError() == null && mItemPriceErrorTextInputLayout.getError() == null)
-        {
-            item.setEnabled(true);
-            item.getIcon().setAlpha(255);
-        } else {
-            // disabled
-            item.setEnabled(false);
-            item.getIcon().setAlpha(130);
+        //Set onChecked listener to the checkboxes to get status
+        for (int i = 0; i < arrayLength; i++) {
+            cb[i].setOnCheckedChangeListener(mCheckboxTouchListener);
         }
-*/
-        /*
-
-        boolean isChecked = false;
-        //initialize available sizes array to store data
-        availableSizes = new ArrayList<String>();
-        //check if single checkbox is selected
-        for(int i = 0; i < arrayLength; i++)
-        {
-            if(cb[i].isChecked())
-            {
-                availableSizes.add(cb[i].getText().toString());
-                isChecked = true;
-                break;
-            }
-        }
-        
-        if(isChecked == false)
-        {
-            mItemSizeErrorTextInputLayout.setError(getString(R.string.error_size));
-        }*/
-
+        //Check and update Sanity check Listener if image is not selected
+        initError[ERROR_SIZES] = !isCheckboxSelected();
+        error.setBoo(initError);
         return EventListenerForSanityCheck.areAllFalse(initError);
-
-
     }
 
 
@@ -518,6 +522,34 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemPriceErrorTextInputLayout.setError(null);
         mItemSizeErrorTextInputLayout.setError(null);
     }
+
+
+    /**
+     * Reads the current field values and Return an Item object with all values set
+     */
+    private Item getCurrentFieldValues()
+    {
+        String category = mCategory;
+        // Use trim to eliminate leading or trailing white space
+        String itemIdString = mItemIdEditText.getText().toString().trim();
+        String imageUrl = mImageUri.toString();
+        //Trims the visible commas of the price
+        int itemPriceString = Integer.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());
+        String[] availableSizes ;
+        this.availableSizes = new ArrayList<>();
+        //check if single checkbox is selected
+        for(int i = 0; i < arrayLength; i++)
+        {
+            if(cb[i].isChecked())
+            {
+                this.availableSizes.add(cb[i].getText().toString());
+            }
+        }
+        availableSizes = this.availableSizes.toArray(new String[this.availableSizes.size()]);
+
+        return new Item(category,itemIdString,imageUrl,itemPriceString,availableSizes);
+    }
+
 
     /**
      * Get user input from editor and save item into database.
@@ -536,7 +568,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // User clicked "Create" button, Write data to database and navigate to parent activity.
                             Toast.makeText(EditoryActivity.this, "Record create successfully", Toast.LENGTH_SHORT).show();
-
+                            // Create a writable packet
+                            Item item = getCurrentFieldValues();
                             NavUtils.navigateUpFromSameTask(EditoryActivity.this);
                         }
                     };

@@ -16,8 +16,11 @@ public class EventListenerForSanityCheck {
     public void setBoo(boolean[] boo) {
         this.boo = boo;
         boolean isClear = areAllFalse(boo);
-        if (listener != null &&  isClear == false) listener.onError();
-        else if (listener != null && isClear == true) listener.onNoError();
+        if (listener != null &&  !isClear) listener.onError();
+        else if (listener != null && isClear) listener.onNoError();
+        //send is clean for on checkbox error
+        listener.onCheckboxError(!boo[3]);
+
     }
 
     public ChangeListener getListener() {
@@ -30,7 +33,7 @@ public class EventListenerForSanityCheck {
 
     public interface ChangeListener {
         void onError();
-
+        void onCheckboxError(boolean a);
         void onNoError();
     }
 
