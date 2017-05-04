@@ -35,7 +35,7 @@ public class EventListenerForSanityCheck {
     }
 
 
-    public boolean areAllFalse(boolean[] array) {
+    public static boolean areAllFalse(boolean[] array) {
         for (boolean b : array) if(b) return false;
         return true;
     }

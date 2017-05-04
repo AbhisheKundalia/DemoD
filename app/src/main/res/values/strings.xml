@@ -82,4 +82,6 @@
     </string-array>
     <string name="title_activity_editory">EditoryActivity</string>
     <string name="category_unknown">UNKNOWN</string>
+    <string name="save_and_create_dialog_msg">Are you sure to Create a new record?</string>
+    <string name="create">Create</string>
 </resources>

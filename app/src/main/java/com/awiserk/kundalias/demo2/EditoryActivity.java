@@ -84,7 +84,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * TextInputLayout to display Item Price error
      */
     private TextInputLayout mItemSizeErrorTextInputLayout;
-     /**
+    /**
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
      */
     private boolean mItemHasChanged = false;
@@ -104,9 +104,16 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     private ArrayList<String> availableSizes = null;
 
 
-    private Menu menu = null ;
+    private Menu menu = null;
 
     private boolean isSaveMenuItemEnabled = true;
+    //Error Code for each field
+    final int ERROR_IMAGE = 0;
+    final int ERROR_ID = 1;
+    final int ERROR_PRICE = 2;
+    final int ERROR_SIZES = 3;
+    final boolean[] initError = new boolean[]{false, false, false, false};
+    final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
 
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
@@ -169,10 +176,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         });
 
 
-
-
-
-
         setupSpinner();
 
     }
@@ -190,6 +193,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         if (mItemHasChanged)
             outState.putBoolean("itemChanged", mItemHasChanged);
     }
+
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -236,6 +240,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             mItemImagelabelTextView.setVisibility(View.GONE);
             mItemImageView.setPadding(0, 0, 0, 0);
             mItemImageView.setImageURI(imageUri);
+            //Check and update Error if image is not selected
+            initError[ERROR_IMAGE] = !isImageSelected();
+            error.setBoo(initError);
         }
     }
 
@@ -289,16 +296,13 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     }
 
 
-    private void addSizesCheckbox(String[] sizes)
-    {
+    private void addSizesCheckbox(String[] sizes) {
         arrayLength = Array.getLength(sizes);
         //if(mItemSizeCheckboxLinearLayout.getChildCount() > 0)
-         //   mItemSizeCheckboxLinearLayout.removeAllViews();
-        if(arrayLength > 0)
-        {
+        //   mItemSizeCheckboxLinearLayout.removeAllViews();
+        if (arrayLength > 0) {
             cb = new CheckBox[arrayLength];
-            for(int i = 0; i < arrayLength; i++)
-            {
+            for (int i = 0; i < arrayLength; i++) {
                 cb[i] = new CheckBox(getApplicationContext());
                 cb[i].setText(sizes[i]);
                 mItemSizeErrorTextInputLayout.addView(cb[i]);
@@ -310,10 +314,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
     /**
      * Method to enable menu item
+     *
      * @param item
      */
-    public void setEnabled(MenuItem item)
-    {
+    public void setEnabled(MenuItem item) {
         isSaveMenuItemEnabled = true;
         // Enabled
         item.setEnabled(true);
@@ -323,10 +327,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
     /**
      * Method to disable menu item
+     *
      * @param item
      */
-    public void setDisabled(MenuItem item)
-    {
+    public void setDisabled(MenuItem item) {
         isSaveMenuItemEnabled = false;
         // Disabled
         item.setEnabled(false);
@@ -334,33 +338,43 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
     }
 
+
+    public boolean isImageSelected() {
+        //Check if image is selected else display error message
+        if (mImageUri == null) {
+            mItemImageErrorTextView.setText(getString(R.string.error_image));
+            return false;
+        }
+        else
+        {
+            mItemImageErrorTextView.setText(null);
+            return true;
+        }
+
+    }
     /**
      * This method performs data sanity check on all the input fields and diplays error with listener
      * Returns the Item object created of clear data
      */
-    private void sanityCheckInputData()
-    {
-        //Error Code for each field
-        final int ERROR_IMAGE = 0;
-        final int ERROR_ID = 1;
-        final int ERROR_PRICE = 2;
-        final int ERROR_SIZES = 3;
+    public boolean sanityCheckInputData() {
+
 
 
         //Set event listener for value to check if there is no error and enable save button
-        final boolean[] initError = new boolean[]{false, false, false, false};
-        final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
+
+
         error.setListener(new EventListenerForSanityCheck.ChangeListener() {
             @Override
             public void onError() {
                 // disabled
                 setDisabled(menu.findItem(R.id.action_save));
-                Toast.makeText(EditoryActivity.this,"Save button disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditoryActivity.this, "Save button disabled", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onNoError() {
                 setEnabled(menu.findItem(R.id.action_save));
-                Toast.makeText(EditoryActivity.this,"Save button enabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -373,8 +387,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
 
         // check if ID the field in the editor are blank and display error to enable/disable Save button
-        if (TextUtils.isEmpty(itemIdString))
-        {   //update Sanity check Listener to disable Save menu item
+        if (TextUtils.isEmpty(itemIdString)) {   //update Sanity check Listener to disable Save menu item
             initError[ERROR_ID] = true;
             error.setBoo(initError);
             mItemIdErrorTextInputLayout.setError(getString(R.string.error_id));
@@ -413,8 +426,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         });
 
         // check if the Price field in the editor are blank and display error to enable/disable Save button
-        if (TextUtils.isEmpty(itemPriceString))
-        {   //update Sanity check Listener to disable Save menu item
+        if (TextUtils.isEmpty(itemPriceString)) {   //update Sanity check Listener to disable Save menu item
             initError[ERROR_PRICE] = true;
             error.setBoo(initError);
             mItemPriceErrorTextInputLayout.setError(getString(R.string.error_price));
@@ -452,7 +464,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
         });
 
-
+        //Check and update Sanity check Listener if image is not selected
+        initError[ERROR_IMAGE] = !isImageSelected();
+        error.setBoo(initError);
 
 
 /*
@@ -467,12 +481,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             item.getIcon().setAlpha(130);
         }
 */
-        /*//Check if image is selected else display error message
-        if(mImageUri == null)
-        {
-            isClean = false;
-            mItemImageErrorTextView.setText(getString(R.string.error_image));
-        }
+        /*
 
         boolean isChecked = false;
         //initialize available sizes array to store data
@@ -493,6 +502,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             mItemSizeErrorTextInputLayout.setError(getString(R.string.error_size));
         }*/
 
+        return EventListenerForSanityCheck.areAllFalse(initError);
+
 
     }
 
@@ -500,8 +511,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     /**
      * This method removes all the errors display as part of sanity check
      */
-    public void removeSanityErrors()
-    {
+    public void removeSanityErrors() {
         //Remove error for all the fields
         mItemImageErrorTextView.setText(null);
         mItemIdErrorTextInputLayout.setError(null);
@@ -514,10 +524,29 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private void saveItem() {
 
-        //removeSanityErrors();
+        //Check error and attach listener if clicked on save for the first time as later listener
+        //will enable and disable save button accordingly
+        // Perform Sanity check on complete data and attach listener to display error
+        if (savecounter == 0 && !sanityCheckInputData()) ;
+        else {
+            // Listener to perform action if user clicks on create/save on alert dialog
+            DialogInterface.OnClickListener saveButtonClickListener =
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            // User clicked "Create" button, Write data to database and navigate to parent activity.
+                            Toast.makeText(EditoryActivity.this, "Record create successfully", Toast.LENGTH_SHORT).show();
+
+                            NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                        }
+                    };
+
+            // Show a dialog that notifies the user if they want to confirm the write
+            showSaveConfirmDialog(saveButtonClickListener);
+        }
+
+        // Counter to trigger and maintain the state of application
         ++savecounter;
-        Log.i("*SAVEiTEM*:", String.valueOf(savecounter));
-        sanityCheckInputData();
 
         //Check if the image is selected else display error message
         // and check if all the fields in the editor are blank and display error
@@ -525,7 +554,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         //TextInputLayout tilCategory = (TextInputLayout) findViewById(R.id.text_input_layout_category);
         // and check if all the fields in the editor are blank and display error
         //tilCategory.setError("This field can not be blank");
-       // mItemSizeCheckboxLinearLayout.setError("select one check box atleast");
+        // mItemSizeCheckboxLinearLayout.setError("select one check box atleast");
 
 
         /*if (TextUtils.isEmpty(imageURLString))
@@ -537,8 +566,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             if (itemPriceString.equalsIgnoreCase("")) {
                 mItemPriceEditText.setError("This field can not be blank");
             }*/
-            // Since no fields were modified, we can return early without creating a new pet.
-            // No need to create ContentValues and no need to do any ContentProvider operations.
+        // Since no fields were modified, we can return early without creating a new pet.
+        // No need to create ContentValues and no need to do any ContentProvider operations.
 
 
 
@@ -591,6 +620,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             }
         }*/
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu options from the res/menu/menu_editor.xml file.
@@ -611,17 +641,15 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         this.menu = menu;
 
         // If save Icon is alrady clicked once only then enable or disable icon as per flag
-        if(savecounter > 0)
-        {
+        if (savecounter > 0) {
 
-            if(isSaveMenuItemEnabled)
-            {
+            if (isSaveMenuItemEnabled) {
                 setEnabled(menu.findItem(R.id.action_save));
-            }
-            else if(!isSaveMenuItemEnabled)
-            {
+            } else if (!isSaveMenuItemEnabled) {
                 setDisabled(menu.findItem(R.id.action_save));
             }
+
+            //Once the state is restored with above methods attach listenerr and restore the state of listener
             sanityCheckInputData();
         }
 
@@ -660,7 +688,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 // Otherwise if there are unsaved changes, setup a dialog to warn the user.
                 // Create a click listener to handle the user confirming that
                 // changes should be discarded.
-                if(mItemHasChanged) {
+                if (mItemHasChanged) {
                     DialogInterface.OnClickListener discardButtonClickListener =
                             new DialogInterface.OnClickListener() {
                                 @Override
@@ -748,6 +776,35 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.unsaved_changes_dialog_msg);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Keep editing" button, so dismiss the dialog
+                // and continue editing the item.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+    /**
+     * Show a dialog that Confirms if the user is sure to Save the items
+     * if they continue leaving the editor.
+     *
+     * @param SaveButtonClickListener is the click listener for what to do when
+     *                                the user confirms they want to Save their changes
+     */
+    private void showSaveConfirmDialog(
+            DialogInterface.OnClickListener SaveButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the postivie and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.save_and_create_dialog_msg);
+        builder.setPositiveButton(R.string.create, SaveButtonClickListener);
         builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Keep editing" button, so dismiss the dialog
