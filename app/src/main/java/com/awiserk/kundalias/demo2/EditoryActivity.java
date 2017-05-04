@@ -11,6 +11,7 @@ import android.support.v7.widget.CardView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -36,6 +37,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
+    int savecounter = 0;
 
     Uri mImageUri = null;
     /**
@@ -101,6 +103,11 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private ArrayList<String> availableSizes = null;
 
+
+    private Menu menu = null ;
+
+    private boolean isSaveMenuItemEnabled = true;
+
     /**
      * OnTouchListener that listens for any user touches on a View, implying that they are modifying
      * the view, and we change the mItemHasChanged boolean to true.
@@ -148,6 +155,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             mImageUri = savedInstanceState.getParcelable("uri");
             mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
             updateImage(mImageUri);
+            isSaveMenuItemEnabled = savedInstanceState.getBoolean("isSaveMenuItemEnabled");
+            savecounter = savedInstanceState.getInt("saveCounter", 0);
+            Log.i("**SAVECOUNTER: *", String.valueOf(savecounter));
         }
 
         // ImagePickerButton shows an image picker to upload a image for a message
@@ -158,10 +168,44 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             }
         });
 
+/*
+        if(savecounter > 0)
+        {
+            sanityCheckInputData();
+        }
+*/
+
 
         setupSpinner();
 
     }
+
+    // Saves the state of image selected on device rotation
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("isSaveMenuItemEnabled", isSaveMenuItemEnabled);
+        outState.putInt("saveCounter", savecounter);
+        Log.i("*ONSAVEiTEM*:", String.valueOf(savecounter));
+
+        if (mImageUri != null)
+            outState.putParcelable("uri", mImageUri);
+        if (mItemHasChanged)
+            outState.putBoolean("itemChanged", mItemHasChanged);
+    }
+/*
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore UI state from the savedInstanceState.
+        // This bundle has also been passed to onCreate.
+        mImageUri = savedInstanceState.getParcelable("uri");
+        mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
+        isSaveMenuItemEnabled = savedInstanceState.getBoolean("isSaveMenuItemEnabled");
+        savecounter = savedInstanceState.getInt("saveCounter");
+        Log.i("*ONRESTOREiTEM*:", String.valueOf(savecounter));
+        updateImage(mImageUri);
+    }*/
 
     @Override
     public void onPickResult(PickResult r) {
@@ -184,26 +228,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             //TODO: do what you have to do with r.getError();
             Toast.makeText(this, r.getError().getMessage(), Toast.LENGTH_LONG).show();
         }
-    }
-
-    // Saves the state of image selected on device rotation
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (mImageUri != null && mItemHasChanged != false) {
-            outState.putParcelable("uri", mImageUri);
-            outState.putBoolean("itemChanged", mItemHasChanged);
-        }
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        // Restore UI state from the savedInstanceState.
-        // This bundle has also been passed to onCreate.
-        mImageUri = savedInstanceState.getParcelable("uri");
-        mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
-        updateImage(mImageUri);
     }
 
     /**
@@ -288,10 +312,36 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     }
 
     /**
+     * Method to enable menu item
+     * @param item
+     */
+    public void setEnabled(MenuItem item)
+    {
+        isSaveMenuItemEnabled = true;
+        // Enabled
+        item.setEnabled(true);
+        item.getIcon().setAlpha(255);
+
+    }
+
+    /**
+     * Method to disable menu item
+     * @param item
+     */
+    public void setDisabled(MenuItem item)
+    {
+        isSaveMenuItemEnabled = false;
+        // Disabled
+        item.setEnabled(false);
+        item.getIcon().setAlpha(130);
+
+    }
+
+    /**
      * This method performs data sanity check on all the input fields and diplays error with listener
      * Returns the Item object created of clear data
      */
-    private void sanityCheckInputData(final MenuItem item)
+    private void sanityCheckInputData()
     {
         //Error Code for each field
         final int ERROR_IMAGE = 0;
@@ -307,15 +357,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             @Override
             public void onError() {
                 // disabled
-                item.setEnabled(false);
-                item.getIcon().setAlpha(130);
+                setDisabled(menu.findItem(R.id.action_save));
                 Toast.makeText(EditoryActivity.this,"Save button disabled", Toast.LENGTH_SHORT).show();
             }
             @Override
             public void onNoError() {
-                // Enabled
-                item.setEnabled(true);
-                item.getIcon().setAlpha(255);
+                setEnabled(menu.findItem(R.id.action_save));
                 Toast.makeText(EditoryActivity.this,"Save button enabled", Toast.LENGTH_SHORT).show();
             }
         });
@@ -468,11 +515,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     /**
      * Get user input from editor and save item into database.
      */
-    private void saveItem(MenuItem item) {
+    private void saveItem() {
 
-        removeSanityErrors();
-
-        sanityCheckInputData(item);
+        //removeSanityErrors();
+        ++savecounter;
+        Log.i("*SAVEiTEM*:", String.valueOf(savecounter));
+        sanityCheckInputData();
 
         //Check if the image is selected else display error message
         // and check if all the fields in the editor are blank and display error
@@ -560,7 +608,22 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_save).getIcon().setAlpha(255);
         super.onPrepareOptionsMenu(menu);
+        this.menu = menu;
+
+        if(savecounter > 0)
+        {
+            if(isSaveMenuItemEnabled)
+            {
+                setEnabled(menu.findItem(R.id.action_save));
+            }
+            else if(!isSaveMenuItemEnabled)
+            {
+                setDisabled(menu.findItem(R.id.action_save));
+            }
+        }
+
         // If this is a new item, hide the "Delete" menu item.
         /*if (mCurrentItemUri == null) {
             MenuItem menuItem = menu.findItem(R.id.action_delete);
@@ -577,7 +640,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             case R.id.action_save:
                 // Save Item to database
                 //TODO saveItem();
-                saveItem(item);
+                saveItem();
+                //setEnabled(item);
                 // Exit activity
                 //finish();
                 return true;
@@ -590,26 +654,26 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             case android.R.id.home:
                 // If the item hasn't changed, continue with navigating up to parent activity
                 // which is the {@link CatalogActivity}.
-                if (!mItemHasChanged) {
-                    NavUtils.navigateUpFromSameTask(EditoryActivity.this);
-                    return true;
-                }
+
 
                 // Otherwise if there are unsaved changes, setup a dialog to warn the user.
                 // Create a click listener to handle the user confirming that
                 // changes should be discarded.
-                DialogInterface.OnClickListener discardButtonClickListener =
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // User clicked "Discard" button, navigate to parent activity.
-                                NavUtils.navigateUpFromSameTask(EditoryActivity.this);
-                            }
-                        };
+                if(mItemHasChanged) {
+                    DialogInterface.OnClickListener discardButtonClickListener =
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // User clicked "Discard" button, navigate to parent activity.
+                                    NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                                }
+                            };
 
-                // Show a dialog that notifies the user they have unsaved changes
-                showUnsavedChangesDialog(discardButtonClickListener);
-                return true;
+                    // Show a dialog that notifies the user they have unsaved changes
+                    showUnsavedChangesDialog(discardButtonClickListener);
+                    return true;
+                }
+
         }
         return super.onOptionsItemSelected(item);
     }
