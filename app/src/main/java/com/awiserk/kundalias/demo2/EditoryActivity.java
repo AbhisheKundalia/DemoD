@@ -168,12 +168,9 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             }
         });
 
-/*
-        if(savecounter > 0)
-        {
-            sanityCheckInputData();
-        }
-*/
+
+
+
 
 
         setupSpinner();
@@ -193,19 +190,19 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         if (mItemHasChanged)
             outState.putBoolean("itemChanged", mItemHasChanged);
     }
-/*
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        // Restore UI state from the savedInstanceState.
+        /*// Restore UI state from the savedInstanceState.
         // This bundle has also been passed to onCreate.
         mImageUri = savedInstanceState.getParcelable("uri");
         mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
         isSaveMenuItemEnabled = savedInstanceState.getBoolean("isSaveMenuItemEnabled");
-        savecounter = savedInstanceState.getInt("saveCounter");
+        savecounter = savedInstanceState.getInt("saveCounter");*/
+        // To set listener on device rotation if Save button is already clicked
         Log.i("*ONRESTOREiTEM*:", String.valueOf(savecounter));
-        updateImage(mImageUri);
-    }*/
+        /*updateImage(mImageUri);*/
+    }
 
     @Override
     public void onPickResult(PickResult r) {
@@ -608,12 +605,15 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        //To restore the alpha of the icon on recreating Menu Item from main activity
         menu.findItem(R.id.action_save).getIcon().setAlpha(255);
         super.onPrepareOptionsMenu(menu);
         this.menu = menu;
 
+        // If save Icon is alrady clicked once only then enable or disable icon as per flag
         if(savecounter > 0)
         {
+
             if(isSaveMenuItemEnabled)
             {
                 setEnabled(menu.findItem(R.id.action_save));
@@ -622,6 +622,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             {
                 setDisabled(menu.findItem(R.id.action_save));
             }
+            sanityCheckInputData();
         }
 
         // If this is a new item, hide the "Delete" menu item.
