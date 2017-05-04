@@ -55,7 +55,9 @@
 
     <!-- Style for the measurement units for an EditText field in the editor -->
     <style name="ErrorText">
+        <item name="android:layout_marginBottom">4dp</item>
         <item name="android:textAppearance">@style/TextAppearance.Design.Error</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/textinput_error_color_light</item>
     </style>
 

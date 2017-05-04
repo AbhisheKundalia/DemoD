@@ -10,12 +10,16 @@
     <string name="backdrop_subtitle">This season top 20 albums</string>
     <!-- Toolbar titles when navigation menu item is selected -->
     <string name="label_category">Category</string>
-    <string name="label_addimage">Add Image</string>
+    <string name="label_addimage">Click me!</string>
     <string name="category1">Rings</string>
     <string name="category2">Bangles</string>
     <string name="category3">Chains</string>
     <string name="category4">Necklace</string>
     <string name="label_id">ID</string>
+    <string name="error_image">Image is required</string>
+    <string name="error_id">Give me an Id</string>
+    <string name="error_price">Don\'t sell me for free!</string>
+    <string name="error_size">Size is required</string>
 
     <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
     <string name="hint_item_name">Name</string>
