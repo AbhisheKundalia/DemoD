@@ -68,7 +68,7 @@
                 android:id="@+id/image_error_view"
                 style="@style/ErrorText"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
@@ -205,23 +205,29 @@
                 android:layout_height="@dimen/input_container_height"
                 android:text="@string/label_size" />
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
+                android:orientation="vertical"
                 android:paddingLeft="4dp">
 
-                <android.support.design.widget.TextInputLayout
+                <TextView
+                    android:id="@+id/size_error_view"
+                    style="@style/ErrorText"
+                    android:paddingLeft="4dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <LinearLayout
                     android:id="@+id/text_input_layout_sizes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="4dp"
-                    app:errorEnabled="true"
-                    app:hintEnabled='false'>
+                    android:orientation="vertical"
+                    android:paddingLeft="4dp">
 
-
-                </android.support.design.widget.TextInputLayout>
-            </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

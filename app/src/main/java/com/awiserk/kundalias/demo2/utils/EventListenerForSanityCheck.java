@@ -18,8 +18,12 @@ public class EventListenerForSanityCheck {
         boolean isClear = areAllFalse(boo);
         if (listener != null &&  !isClear) listener.onError();
         else if (listener != null && isClear) listener.onNoError();
-        //send is clean for on checkbox error
-        listener.onCheckboxError(!boo[3]);
+
+        if (listener != null)
+        {
+            //send is clean for on checkbox error
+            listener.onCheckboxError(!boo[3]);
+        }
 
     }
 
