@@ -107,6 +107,11 @@ public class DataProvider {
         return new Item(String.valueOf(position), (int) (position * 1000000 + 7), covers[position]);
     }
 
+    private static void writeOnline(Item item)
+    {
+
+    }
+
     public static List<Item> getITEMS() {
         return ITEMS;
     }

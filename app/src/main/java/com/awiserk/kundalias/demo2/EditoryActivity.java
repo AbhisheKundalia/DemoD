@@ -46,6 +46,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     final int ERROR_ID = 1;
     final int ERROR_PRICE = 2;
     final int ERROR_SIZES = 3;
+    final boolean APPENDCATEGORY = true;
     final boolean[] initError = new boolean[]{false, false, false, false};
     final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
     int savecounter = 0;
@@ -197,9 +198,11 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         super.onSaveInstanceState(outState);
         outState.putBoolean("isSaveMenuItemEnabled", isSaveMenuItemEnabled);
         outState.putInt("saveCounter", savecounter);
-        if(getCheckedSizes().size() > 0)
+        // greater than 1 and not 0 as size will be one on additon of mcategory to the list as parammeter is set to true
+        // mcategory is added to identify that sizes belong to which category on rotation
+        if(getCheckedSizes(APPENDCATEGORY).size() > 1)
         {
-            outState.putStringArrayList("checkedAvailabelSizes", getCheckedSizes());
+            outState.putStringArrayList("checkedAvailabelSizes", getCheckedSizes(APPENDCATEGORY));
         }
         //elsa throws null pointer exception
         if (mImageUri != null)
@@ -584,11 +587,18 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
 
     /**
-     * get the current checked available sizes
+     * Get the current checked available sizes
+     * @param isCategoryAppended is true if category is required to be appended to restore the state on rotation
+     *                           and is false if available sizes is required to write to database without category
+     *                           appended and returning only checked sizes
+     * @return StringArrayList of checked available sizes as per the input provided
      */
-    private ArrayList<String> getCheckedSizes(){
+    private ArrayList<String> getCheckedSizes(boolean isCategoryAppended){
         this.availableSizes = new ArrayList<String>();
-        this.availableSizes.add(mCategory);
+        if(isCategoryAppended)
+        {
+            this.availableSizes.add(mCategory);
+        }
         //check if single checkbox is selected
         for(int i = 0; i < arrayLength; i++)
         {
@@ -619,6 +629,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             }
         }*/
     }
+
+
     /**
      * Reads the current field values and Return an Item object with all values set
      */
@@ -630,7 +642,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         String imageUrl = mImageUri.toString();
         //Trims the visible commas of the price
         int itemPriceString = Integer.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());
-        String[] availableSizes = getCheckedSizes().toArray(new String[this.availableSizes.size()]);
+        //Get checked sizes without appending category to write to database
+        String[] availableSizes = getCheckedSizes(!APPENDCATEGORY).toArray(new String[this.availableSizes.size()]);
 
         return new Item(category,itemIdString,imageUrl,itemPriceString,availableSizes);
     }
@@ -641,7 +654,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private void saveItem() {
 
-        //Check error and attach listener if clicked on save for the first time as later listener
+        removeSanityErrors();
+        //Check error and attach listener if clicked on save for the first time (savecounter determines) as later listener
         //will enable and disable save button accordingly
         // Perform Sanity check on complete data and attach listener to display error
         if (savecounter == 0 && !sanityCheckInputData()) ;
