@@ -27,12 +27,12 @@ public class DataProvider {
     public static final int CATEGORY_4 = 4;
     // urls to load navigation header background image
     // and profile image
-    private static final String urlNavHeaderBg = "https://scontent.fblr2-1.fna.fbcdn.net/v/t1.0-9/17155643_604619189727656_6470350059459558370_n.jpg?oh=1cbf62b6ed6d76c6e18e81449ec21aee&oe=5981EFD8";
-    private static final String urlProfileImg = "https://scontent.fblr2-1.fna.fbcdn.net/v/t1.0-9/17155643_604619189727656_6470350059459558370_n.jpg?oh=1cbf62b6ed6d76c6e18e81449ec21aee&oe=5981EFD8";
+    private static final String urlNavHeaderBg = "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcROIjxEmenSgZsYm33DvLVRCIxN-1eQe8sPwSut5VpquxzFNePgwA";
+    private static final String urlProfileImg = "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSlMRm2D73ned5NDnbxG0e86zwcn5sCcGtzfjRwIifAF6rBIDpFlTQEaMmU";
     private static final String userName = "Abhishek Kundalia";
     private static final String userEmail = "abhishekundalia@gmail.com";
-    private static final String cat1CoverImg = "https://img.clipartfox.com/6a7ba8a6429e1b6ae50adb34acee6957_nature-google-the-vineyard-google-clipart-nature_1600-1200.jpeg";
-    private static final String cat2CoverImg = "http://www.pageresource.com/wallpapers/wallpaper/beautiful-love-nature.jpg";
+    private static final String cat1CoverImg = "https://pixabay.com/get/e83db1062afc073ed1534705fb0938c9bd22ffd41db8154091f3c87da3/rings-1809286_1920.jpg";
+    private static final String cat2CoverImg = "http://i.huffpost.com/gen/857659/images/o-FABULOUS-FINDS-APPRAISING-GOLD-JEWELRY-facebook.jpg";
     private static final String cat3CoverImg = "https://lh3.googleusercontent.com/TtI6JoY58rWbxfsHeycrJEIM2nNGK6GySQhZIUU5FtNyd-TasX9xwcmhEqBCOuPW7e0=h1264";
     private static final String cat4CoverImg = "https://theamplifierfoundation.org/site/wp-content/uploads/2017/02/OurAncestorsDreamedOfUs26x50.jpg";
     private static final int COUNT = 10;

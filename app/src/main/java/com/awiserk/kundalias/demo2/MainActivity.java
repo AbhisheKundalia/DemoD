@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        headerBgProgressBar.setVisibility(View.VISIBLE);
+                        headerBgProgressBar.setVisibility(View.GONE);
                         return false;
                     }
                 })
@@ -372,8 +372,8 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        profileProgressBar.setVisibility(View.VISIBLE);
-                        Log.i("Glide on Exception", "Glide progress bar is visble");
+                        profileProgressBar.setVisibility(View.GONE);
+                        Log.i("Glide on Exception", "Glide progress bar is Gone");
                         return false;
                     }
 

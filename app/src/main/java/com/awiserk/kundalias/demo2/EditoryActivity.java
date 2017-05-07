@@ -467,7 +467,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 {
                     //Remove error
                     if(mItemSizeErrorTextView.getText() != "" && !initError[ERROR_SIZES])
+                    {
+                        mItemSizeErrorTextView.startAnimation(AnimationUtils.loadAnimation(EditoryActivity.this, android.R.anim.fade_out));
                         mItemSizeErrorTextView.setText(null);
+                    }
                 }
             }
         });

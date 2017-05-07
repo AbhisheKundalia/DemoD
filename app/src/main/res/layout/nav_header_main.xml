@@ -43,15 +43,17 @@
 
         <RelativeLayout
             android:layout_width="@dimen/profile_width"
-            android:layout_height="@dimen/profile_height">
+            android:layout_height="@dimen/profile_height"
+            android:layout_marginTop="8dp">
 
             <ProgressBar
                 android:id="@+id/profile_progress"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_centerInParent="true"
-                android:layout_margin="22.5dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="16dp"
+                android:layout_centerHorizontal="true"
                 android:background="@drawable/circle_shape"
                 android:indeterminate="true"
                 android:max="100"
