@@ -443,7 +443,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
                 // disabled
                 setDisabled(menu.findItem(R.id.action_save));
-                Toast.makeText(EditoryActivity.this, "Save button disabled", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(EditoryActivity.this, "Save button disabled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -451,7 +451,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
 
                 setEnabled(menu.findItem(R.id.action_save));
-                Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -669,7 +669,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // User clicked "Create" button, Write data to database and navigate to parent activity.
-                            Toast.makeText(EditoryActivity.this, "Record create successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(EditoryActivity.this, "Record created successfully", Toast.LENGTH_SHORT).show();
                             // Create a writable packet
                             Item item = getCurrentFieldValues();
                             NavUtils.navigateUpFromSameTask(EditoryActivity.this);
