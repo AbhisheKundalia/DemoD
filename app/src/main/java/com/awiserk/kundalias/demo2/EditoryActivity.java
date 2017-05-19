@@ -39,6 +39,7 @@ import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
     //Error Code for each field
@@ -642,13 +643,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         String category = mCategory;
         // Use trim to eliminate leading or trailing white space
         String itemIdString = mItemIdEditText.getText().toString().trim();
-        String imageUrl = mImageUri.toString();
+        Uri imageUrl = mImageUri;
         //Trims the visible commas of the price
-        int itemPriceString = Integer.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());
+        long itemPriceString = Long.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());
         //Get checked sizes without appending category to write to database
-        String[] availableSizes = getCheckedSizes(!APPENDCATEGORY).toArray(new String[this.availableSizes.size()]);
-
-        return new Item(category,itemIdString,imageUrl,itemPriceString,availableSizes);
+        List<String> availableSizes = getCheckedSizes(!APPENDCATEGORY);
+        return new Item(category,itemIdString,imageUrl.toString(),itemPriceString,availableSizes);
     }
 
 
@@ -669,9 +669,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             // User clicked "Create" button, Write data to database and navigate to parent activity.
-                            Toast.makeText(EditoryActivity.this, "Record created successfully", Toast.LENGTH_SHORT).show();
+
                             // Create a writable packet
                             Item item = getCurrentFieldValues();
+                            DataProvider.initFirebase();
+                            DataProvider.createItem(EditoryActivity.this, item);
+
                             NavUtils.navigateUpFromSameTask(EditoryActivity.this);
                         }
                     };

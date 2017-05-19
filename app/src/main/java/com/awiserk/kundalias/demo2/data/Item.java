@@ -15,18 +15,24 @@
  */
 package com.awiserk.kundalias.demo2.data;
 
+import android.net.Uri;
+
+import com.google.firebase.database.Exclude;
+
+import java.util.List;
+
 public class Item {
 
     private String category;
     private String name;
     private String imageUrl;
-    private int cost;
-    private String[] availableSizes;
+    private long cost;
+    private List<String> availableSizes;
 
     public Item() {
     }
 
-    public Item(String category, String name, String imageUrl, int cost, String[] availableSizes) {
+    public Item(String category, String name, String imageUrl, long cost, List<String> availableSizes) {
         this.category = category;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -34,6 +40,7 @@ public class Item {
         this.availableSizes = availableSizes;
     }
 
+    @Exclude
     public String getCategory() {
         return category;
     }
@@ -58,7 +65,7 @@ public class Item {
         this.imageUrl = imageUrl;
     }
 
-    public int getCost() {
+    public long getCost() {
         return cost;
     }
 
@@ -66,11 +73,11 @@ public class Item {
         this.cost = cost;
     }
 
-    public String[] getAvailableSizes() {
+    public List<String> getAvailableSizes() {
         return availableSizes;
     }
 
-    public void setAvailableSizes(String[] availableSizes) {
+    public void setAvailableSizes(List<String> availableSizes) {
         this.availableSizes = availableSizes;
     }
 }
