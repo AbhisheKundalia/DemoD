@@ -1,9 +1,14 @@
 package com.awiserk.kundalias.demo2;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +37,19 @@ import com.awiserk.kundalias.demo2.data.DataProvider;
 import com.awiserk.kundalias.demo2.data.Item;
 import com.awiserk.kundalias.demo2.utils.EventListenerForSanityCheck;
 import com.awiserk.kundalias.demo2.utils.NumberTextWatcherForThousand;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnPausedListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.vansuita.pickimage.bean.PickResult;
 import com.vansuita.pickimage.bundle.PickSetup;
 import com.vansuita.pickimage.dialog.PickImageDialog;
@@ -41,7 +59,19 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
+
+    public static final int UNSUCCESS_WRITE = 404;
+    public static final int SUCCESS_WRITE = 200;
+
+    // Firebase instance variables
+    private static FirebaseDatabase mFirebaseDatabase;
+    private static StorageReference mCatalogPhotosStorageReference;
+    private static DatabaseReference mCategoryDatabaseReference;
+    // private FirebaseAuth mFirebaseAuth;
+    // private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private static FirebaseStorage mFirebaseStorage;
     //Error Code for each field
     final int ERROR_IMAGE = 0;
     final int ERROR_ID = 1;
@@ -52,6 +82,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     final EventListenerForSanityCheck error = new EventListenerForSanityCheck(initError);
     int savecounter = 0;
     Uri mImageUri = null;
+    CheckBox.OnCheckedChangeListener mCheckboxTouchListener = null;
+    private ChildEventListener mChildEventListener;
     /**
      * Card Image View to hold each Item
      */
@@ -61,13 +93,13 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      */
     private ImageView mItemImageView;
     /**
-     * TextView Label to add Image
-     */
-    private TextView mItemImagelabelTextView;
-    /**
      * Linearlayout block field to enter the item Size Checkbox
      */
     //private LinearLayout mItemSizeCheckboxLinearLayout;
+    /**
+     * TextView Label to add Image
+     */
+    private TextView mItemImagelabelTextView;
     /**
      * TextView Label to display Image Error
      */
@@ -100,7 +132,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * TextView Label to display Image Error
      */
     private TextView mItemSizeErrorTextView;
-
+    private ProgressDialog mProgressBar;
     /**
      * Boolean flag that keeps track of whether the item has been edited (true) or not (false)
      */
@@ -114,9 +146,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
      * Keep track of total number of checkboxes available
      */
     private int arrayLength = 0;
-
-
-    CheckBox.OnCheckedChangeListener mCheckboxTouchListener = null;
     /**
      * stores all the available sizes based on user selection
      */
@@ -136,6 +165,14 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         }
     };
 
+    public static void initFirebase() {
+        // Initialize Firebase components
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        //mFirebaseDatabase.setPersistenceEnabled(true);
+        //mFirebaseAuth = FirebaseAuth.getInstance();
+        mFirebaseStorage = FirebaseStorage.getInstance();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +207,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         //Loads the already set image on device rotation
         if (savedInstanceState != null) {
             mImageUri = savedInstanceState.getParcelable("uri");
-            if(mImageUri != null) {
+            if (mImageUri != null) {
                 updateImage(mImageUri);
             }
             mItemHasChanged = savedInstanceState.getBoolean("itemChanged");
@@ -201,8 +238,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         outState.putInt("saveCounter", savecounter);
         // greater than 1 and not 0 as size will be one on additon of mcategory to the list as parammeter is set to true
         // mcategory is added to identify that sizes belong to which category on rotation
-        if(getCheckedSizes(APPENDCATEGORY).size() > 1)
-        {
+        if (getCheckedSizes(APPENDCATEGORY).size() > 1) {
             outState.putStringArrayList("checkedAvailabelSizes", getCheckedSizes(APPENDCATEGORY));
         }
         //elsa throws null pointer exception
@@ -311,7 +347,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         });
     }
 
-
     private void addSizesCheckbox(String[] sizes) {
         arrayLength = Array.getLength(sizes);
         mItemSizeLinearLayout.removeAllViewsInLayout();
@@ -329,27 +364,23 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                 //restore the state before rotation
                 //Check if available size is not null and its size is greater than 0 to compare and allow checked
                 //checkboxes on screen rotation
-                if(availableSizes != null && availableSizes.size() > 0 && availableSizes.get(0).equalsIgnoreCase(mCategory))
-                {
+                if (availableSizes != null && availableSizes.size() > 0 && availableSizes.get(0).equalsIgnoreCase(mCategory)) {
 
-                    if(j < availableSizes.size() && sizes[i].trim().equalsIgnoreCase(availableSizes.get(j).trim()) ) {
+                    if (j < availableSizes.size() && sizes[i].trim().equalsIgnoreCase(availableSizes.get(j).trim())) {
                         cb[i].setChecked(true);
                         j++;
                     }
 
-                }else if(availableSizes != null)
-                {
+                } else if (availableSizes != null) {
                     availableSizes.clear();
                 }
 
-                if(savecounter > 0)
-                {
+                if (savecounter > 0) {
                     //Set onChecked listener to the checkboxes to get status
                     cb[i].setOnCheckedChangeListener(mCheckboxTouchListener);
                 }
             }
-            if(savecounter > 0)
-            {                //Setting error to true as when initialized checkboxes will be unchecked thus show error
+            if (savecounter > 0) {                //Setting error to true as when initialized checkboxes will be unchecked thus show error
                 initError[ERROR_SIZES] = !isCheckboxSelected();
                 error.setBoo(initError);
             }
@@ -384,7 +415,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
     }
 
-
     /**
      * This method checks if Image is selected or not
      *
@@ -401,7 +431,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         }
 
     }
-
 
     /**
      * This method Check if any of the checkbox is selected
@@ -444,7 +473,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
                 // disabled
                 setDisabled(menu.findItem(R.id.action_save));
-               // Toast.makeText(EditoryActivity.this, "Save button disabled", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(EditoryActivity.this, "Save button disabled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -452,23 +481,19 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
 
                 setEnabled(menu.findItem(R.id.action_save));
-               // Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(EditoryActivity.this, "Save button enabled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCheckboxError(boolean isClean) {
                 //Condition set so that error is not overwritten giving blinking effect to error
-                if(mItemSizeErrorTextView.getText() == "" && initError[ERROR_SIZES])
-                {
+                if (mItemSizeErrorTextView.getText() == "" && initError[ERROR_SIZES]) {
                     //Display error
                     mItemSizeErrorTextView.startAnimation(AnimationUtils.loadAnimation(EditoryActivity.this, android.R.anim.fade_in));
                     mItemSizeErrorTextView.setText(R.string.error_size);
-                }
-                else
-                {
+                } else {
                     //Remove error
-                    if(mItemSizeErrorTextView.getText() != "" && !initError[ERROR_SIZES])
-                    {
+                    if (mItemSizeErrorTextView.getText() != "" && !initError[ERROR_SIZES]) {
                         mItemSizeErrorTextView.startAnimation(AnimationUtils.loadAnimation(EditoryActivity.this, android.R.anim.fade_out));
                         mItemSizeErrorTextView.setText(null);
                     }
@@ -576,8 +601,6 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         return EventListenerForSanityCheck.areAllFalse(initError);
     }
 
-
-
     /**
      * This method removes all the errors display as part of sanity check
      */
@@ -589,25 +612,22 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         mItemSizeErrorTextView.setText(null);
     }
 
-
     /**
      * Get the current checked available sizes
+     *
      * @param isCategoryAppended is true if category is required to be appended to restore the state on rotation
      *                           and is false if available sizes is required to write to database without category
      *                           appended and returning only checked sizes
      * @return StringArrayList of checked available sizes as per the input provided
      */
-    private ArrayList<String> getCheckedSizes(boolean isCategoryAppended){
+    private ArrayList<String> getCheckedSizes(boolean isCategoryAppended) {
         this.availableSizes = new ArrayList<String>();
-        if(isCategoryAppended)
-        {
+        if (isCategoryAppended) {
             this.availableSizes.add(mCategory);
         }
         //check if single checkbox is selected
-        for(int i = 0; i < arrayLength; i++)
-        {
-            if(cb[i].isChecked())
-            {
+        for (int i = 0; i < arrayLength; i++) {
+            if (cb[i].isChecked()) {
                 this.availableSizes.add(cb[i].getText().toString());
             }
         }
@@ -615,12 +635,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
     }
 
-
     /**
      * Set the Checked list as per input
      */
-    private void restoreCheckboxState()
-    {
+    private void restoreCheckboxState() {
         /*Log.i("available sizes:", String.valueOf(availableSizes));
         for(int i = 0, j = 0; i < arrayLength && j < availableSizes.length; i++)
         {
@@ -634,12 +652,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         }*/
     }
 
-
     /**
      * Reads the current field values and Return an Item object with all values set
      */
-    private Item getCurrentFieldValues()
-    {
+    private Item getCurrentFieldValues() {
         String category = mCategory;
         // Use trim to eliminate leading or trailing white space
         String itemIdString = mItemIdEditText.getText().toString().trim();
@@ -648,9 +664,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         long itemPriceString = Long.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());
         //Get checked sizes without appending category to write to database
         List<String> availableSizes = getCheckedSizes(!APPENDCATEGORY);
-        return new Item(category,itemIdString,imageUrl.toString(),itemPriceString,availableSizes);
+        return new Item(category, itemIdString, imageUrl.toString(), itemPriceString, availableSizes);
     }
-
 
     /**
      * Get user input from editor and save item into database.
@@ -672,10 +687,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
                             // Create a writable packet
                             Item item = getCurrentFieldValues();
-                            DataProvider.initFirebase();
-                            DataProvider.createItem(EditoryActivity.this, item);
-
-                            NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                            initFirebase();
+                            createItem(item);
                         }
                     };
 
@@ -869,6 +882,144 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
         // Show dialog that there are unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
+    }
+
+    public void createItem(final Item item) {
+        mCategoryDatabaseReference = mFirebaseDatabase.getReference().child("catalog").child(item.getCategory());
+        // mCategoryDatabaseReference = mFirebaseDatabase.getReference().child("catalog");;
+        mCatalogPhotosStorageReference = mFirebaseStorage.getReference().child("catalog").child(item.getCategory());
+
+        final Uri selectedImageUri = Uri.parse(item.getImageUrl());
+        // Get a reference to store file at chat_photos/<FILENAME>
+        final StorageReference imageRef = mCatalogPhotosStorageReference.child(item.getName());
+
+
+        final Snackbar snackbar;
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        snackbar = Snackbar
+                .make(coordinatorLayout, getString(R.string.connection_error), Snackbar.LENGTH_INDEFINITE)
+                .setAction("RETRY", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                    }
+                });
+        snackbar.setActionTextColor(Color.RED);
+
+
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+        connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected) {
+
+                    if (snackbar.isShown()) {
+                        snackbar.setText("Connected");
+                        snackbar.dismiss();
+                    }
+
+                    mCategoryDatabaseReference.child(item.getName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                // TODO: handle the case where the data already exists
+                                AlertDialog.Builder builder = new AlertDialog.Builder(EditoryActivity.this);
+                                builder.setMessage(String.format(getResources().getString(R.string.id_already_exist_error), item.getName()));
+                                builder.setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        // User clicked the "Ok" button, so dismiss the dialog
+                                        // and continue editing the Item.
+                                        if (dialog != null) {
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                });
+                                builder.setCancelable(false);
+                                // Create and show the AlertDialog
+                                AlertDialog alertDialog = builder.create();
+                                alertDialog.show();
+
+
+                            } else {
+                                // TODO: handle the case where the data does not yet exist
+
+
+                                mProgressBar = new ProgressDialog(EditoryActivity.this);
+                                mProgressBar.setTitle("Creating Item");
+                                mProgressBar.setMessage("Uploading...");
+                                mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                                mProgressBar.setIndeterminate(true);
+                                mProgressBar.setProgress(0);
+                                mProgressBar.show();
+
+                                final int[] currentprogress = new int[1];
+                                // Upload file to Firebase Storage
+                                imageRef.putFile(selectedImageUri).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Handle unsuccessful uploads
+                                        Log.i("Error Upload", "error:" + exception);
+
+
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+
+                                        // Set the download URL to the item Image, so that the user can send it to the database
+                                        assert downloadUrl != null;
+                                        item.setImageUrl(downloadUrl.toString());
+                                        mCategoryDatabaseReference.child(item.getName()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                mProgressBar.setProgress((int) (currentprogress[0] * (5.0 / (100 - 5))));
+                                                Toast.makeText(EditoryActivity.this, getString(R.string.record_created_success), Toast.LENGTH_SHORT).show();
+                                                NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                                            }
+                                        });
+                                    }
+                                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                                        double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                                        Log.i("Upload is ", +progress + "% done");
+                                        currentprogress[0] = (int) (progress - (0.05 * progress));
+
+                                        mProgressBar.setProgress(currentprogress[0]);
+                                    }
+                                }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
+                                        mProgressBar.setMessage("Upload is paused");
+                                    }
+                                });
+
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+
+                    });
+
+                } else {
+
+                    snackbar.show();
+                    Log.i("Disconnected!", "YES");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        });
+
     }
 
     /**

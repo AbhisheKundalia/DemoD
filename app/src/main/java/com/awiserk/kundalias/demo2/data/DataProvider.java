@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.awiserk.kundalias.demo2.EditoryActivity;
 import com.awiserk.kundalias.demo2.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -14,6 +12,8 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnPausedListener;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -27,15 +27,6 @@ import java.util.List;
  */
 public class DataProvider {
 
-
-    // Firebase instance variables
-    private static FirebaseDatabase mFirebaseDatabase;
-    private ChildEventListener mChildEventListener;
-    private static StorageReference mCatalogPhotosStorageReference;
-    private static DatabaseReference mCategoryDatabaseReference;
-    // private FirebaseAuth mFirebaseAuth;
-    // private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private static FirebaseStorage mFirebaseStorage;
 
 
     /**
@@ -74,13 +65,13 @@ public class DataProvider {
             R.drawable.album7,
             R.drawable.album8,
     };
-    public static String[] ringsSizes = new String[]{"xl","abc", "asd", "adf"};
+    public static String[] ringsSizes = new String[]{"xl", "abc", "asd", "adf"};
 
-    public static String[] banglesSizes = new String[]{"xjbl","abc", "asd", "adf", "asdf", "efw23"};
+    public static String[] banglesSizes = new String[]{"xjbl", "abc", "asd", "adf", "asdf", "efw23"};
 
-    public static String[] chainsSizes = new String[]{"xl","abc", "asd", "adf", "asewe2", "q"};
+    public static String[] chainsSizes = new String[]{"xl", "abc", "asd", "adf", "asewe2", "q"};
 
-    public static String[] necklaceSizes = new String[]{"xl","abc", "asd", "adf"};
+    public static String[] necklaceSizes = new String[]{"xl", "abc", "asd", "adf"};
 
     static {
         // Add some sample items.
@@ -90,63 +81,8 @@ public class DataProvider {
     }
 
 
-    public static void initFirebase()
-    {
-        // Initialize Firebase components
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        //mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseStorage = FirebaseStorage.getInstance();
-
-    }
 
 
-    public static void createItem(final Activity activity, final com.awiserk.kundalias.demo2.data.Item item) {
-        mCategoryDatabaseReference = mFirebaseDatabase.getReference().child("catalog").child(item.getCategory());
-       // mCategoryDatabaseReference = mFirebaseDatabase.getReference().child("catalog");;
-        mCatalogPhotosStorageReference = mFirebaseStorage.getReference().child("catalog").child(item.getCategory());
-
-        Uri selectedImageUri = Uri.parse(item.getImageUrl());
-        // Get a reference to store file at chat_photos/<FILENAME>
-        StorageReference imageRef = mCatalogPhotosStorageReference.child(item.getName());
-
-
-        // Upload file to Firebase Storage
-       /* imageRef.putFile(selectedImageUri)
-                .addOnSuccessListener(activity, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // When the image has successfully uploaded, we get its download URL
-                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-                        // Set the download URL to the item Image, so that the user can send it to the database
-                        item.setImageUrl(downloadUrl);
-                        mCategoryDatabaseReference.child(item.getName()).setValue(item);
-
-                        Toast.makeText(activity, "Record created successfully", Toast.LENGTH_SHORT).show();
-                    }
-                });*/
-
-
-        imageRef.putFile(selectedImageUri).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
-                Log.i("Error Upload", "error:" + exception);
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-
-
-                // Set the download URL to the item Image, so that the user can send it to the database
-                assert downloadUrl != null;
-                item.setImageUrl(downloadUrl.toString());
-                mCategoryDatabaseReference.child(item.getName()).setValue(item);
-                //Toast.makeText(activity, "Record created successfully", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
 
     public static String getCatCoverImg(int index) {

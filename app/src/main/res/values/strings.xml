@@ -83,4 +83,8 @@
     <string name="category_unknown">UNKNOWN</string>
     <string name="save_and_create_dialog_msg">Are you sure to Create a new record?</string>
     <string name="create">Create</string>
+    <string name="record_created_success">Record created successfully!</string>
+    <string name="connection_error">No internet connection!</string>
+    <string name="id_already_exist_error">Item with ID: %1$s already exists. Please select unique ID.</string>
+    <string name="ok">Ok</string>
 </resources>
