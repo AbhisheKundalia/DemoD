@@ -18,26 +18,32 @@ import com.awiserk.kundalias.demo2.utils.GridSpacingItemDecorator;
  * Created by Abhishek on 4/12/2017.
  */
 
-public class FragList2 extends android.support.v4.app.Fragment {
+public class FragList extends android.support.v4.app.Fragment {
     private RecyclerView rv;
+    private static String mCategory;
 
-    public static FragList2 newInstance() {
-        FragList2 fragList2 = new FragList2();
-        return fragList2;
+    public FragList() {
+        super();
+    }
+
+    public static FragList newInstance(String category) {
+        FragList fragList = new FragList();
+        mCategory = category;
+        return fragList;
     }
 
     @Override
     public String toString() {
-        return "Frag_list2";
+        return mCategory;
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View rootview = inflater.inflate(R.layout.frag_list2, null);
+        View rootview = inflater.inflate(R.layout.frag_list, null);
 
         //Reference
-        rv = (RecyclerView) rootview.findViewById(R.id.list2_rv);
+        rv = (RecyclerView) rootview.findViewById(R.id.list_rv);
 
         //Layout Manager
         rv.setLayoutManager(new GridLayoutManager(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity())));
@@ -47,7 +53,8 @@ public class FragList2 extends android.support.v4.app.Fragment {
         rv.setItemAnimator(new DefaultItemAnimator());
 
         //Adapter
-        rv.setAdapter(new MyItemRecyclerViewAdapter(getActivity(), DataProvider.getITEMS()));
+        rv.setAdapter(new MyItemRecyclerViewAdapter(getActivity(), DataProvider.getITEMS(mCategory)));
         return rootview;
     }
+
 }

@@ -25,10 +25,7 @@ import android.widget.TextView;
 
 import com.awiserk.kundalias.demo2.data.DataProvider;
 import com.awiserk.kundalias.demo2.utils.CircleTransform;
-import com.awiserk.kundalias.demo2.mFragments.FragList1;
-import com.awiserk.kundalias.demo2.mFragments.FragList2;
-import com.awiserk.kundalias.demo2.mFragments.FragList3;
-import com.awiserk.kundalias.demo2.mFragments.FragList4;
+import com.awiserk.kundalias.demo2.mFragments.FragList;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
@@ -314,18 +311,18 @@ public class MainActivity extends AppCompatActivity {
         switch (navItemIndex) {
             case 0:
                 // Category1
-                return FragList1.newInstance();
+                return FragList.newInstance(getString(R.string.category1));
             case 1:
                 // Category2
-                return FragList2.newInstance();
+                return FragList.newInstance(getString(R.string.category2));
             case 2:
                 // Category3
-                return FragList3.newInstance();
+                return FragList.newInstance(getString(R.string.category3));
             case 3:
                 // Category4
-                return FragList4.newInstance();
+                return FragList.newInstance(getString(R.string.category4));
             default:
-                return FragList1.newInstance();
+                return FragList.newInstance(getString(R.string.category1));
         }
     }
 

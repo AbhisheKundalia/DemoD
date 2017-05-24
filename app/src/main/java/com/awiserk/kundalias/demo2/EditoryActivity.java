@@ -293,6 +293,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             mItemCardView.setAlpha(1.0f);
             mItemImagelabelTextView.setVisibility(View.GONE);
             mItemImageView.setPadding(0, 0, 0, 0);
+            mItemImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             mItemImageView.setImageURI(imageUri);
             //Check and update Error if image is not selected
             initError[ERROR_IMAGE] = !isImageSelected();

@@ -9,8 +9,12 @@ import com.awiserk.kundalias.demo2.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
@@ -71,7 +75,10 @@ public class DataProvider {
 
     public static String[] chainsSizes = new String[]{"xl", "abc", "asd", "adf", "asewe2", "q"};
 
-    public static String[] necklaceSizes = new String[]{"xl", "abc", "asd", "adf"};
+    public static String[] necklaceSizes = new String[]{"xl", "abc", "asewe2", "q"};
+
+
+    private static FirebaseDatabase mFirebaseDatabase;
 
     static {
         // Add some sample items.
@@ -80,9 +87,9 @@ public class DataProvider {
         }
     }
 
-
-
-
+    private int mPageEndOffset;
+    private int mPageLimit;
+    private String tag = "DataProvider";
 
 
     public static String getCatCoverImg(int index) {
@@ -123,13 +130,81 @@ public class DataProvider {
     private static void addItem(Item item) {
         ITEMS.add(item);
     }
-
+    public static Uri getUrl(int res){
+        return Uri.parse("android.resource://com.awiserk.kundalias.demo2/" + res);
+    }
     private static Item createDummyItem(int position) {
-        return new Item(String.valueOf(position), (int) (position * 1000000 + 7), covers[position]);
+        List<String> necklaceSizes = new ArrayList<String>();
+        necklaceSizes.add("asdf");
+        necklaceSizes.add("abc");
+        return new Item("TestCategory", String.valueOf(position), getUrl(covers[position]).toString(),(int) (position * 1000000 + 7), necklaceSizes);
     }
 
-    public static List<Item> getITEMS() {
+    public static List<Item> getITEMS(String category) {
         return ITEMS;
+    }
+    public static void initFirebase() {
+        // Initialize Firebase components
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+    }
+
+    private void getItem(String category) {
+
+        mPageEndOffset = 0;
+        mPageLimit = 10;
+
+
+        mPageEndOffset += mPageLimit;
+
+        Query itemListQuery = mFirebaseDatabase.getReference().child("catalog").child(category)
+                .limitToLast(mPageLimit).startAt(mPageEndOffset);
+
+
+
+        ChildEventListener videosChildEventListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String date = dataSnapshot.getKey();
+                String temp = date;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+                Log.d(tag, "database error");
+            }
+        };
+
+
+        ValueEventListener itemValueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Item item = (Item) dataSnapshot.getValue();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d(tag, "database error");
+            }
+        };
+//        videosQuery.addChildEventListener(videosChildEventListener);
+        itemListQuery.addValueEventListener(itemValueEventListener);
+
     }
 
 
@@ -137,42 +212,5 @@ public class DataProvider {
      * A dummy item representing a piece of content.
      */
 
-    public static class Item {
-        private String id;
-        private int cost;
-        private int thumbnail;
 
-        public Item() {
-        }
-
-        public Item(String id, int cost, int thumbnail) {
-            this.id = id;
-            this.cost = cost;
-            this.thumbnail = thumbnail;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getCost() {
-            return Integer.toString(cost);
-        }
-
-        public void setCost(int cost) {
-            this.cost = cost;
-        }
-
-        public int getThumbnail() {
-            return thumbnail;
-        }
-
-        public void setThumbnail(int thumbnail) {
-            this.thumbnail = thumbnail;
-        }
-    }
 }
