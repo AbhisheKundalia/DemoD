@@ -28,15 +28,12 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
         this.items = items;
     }
 
-    public void addItemIsAdapter(List<Item> items)
-    {
-        //add list to current arraylist of data
-    }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(c).inflate(R.layout.fragment_item, parent, false);
         return new ViewHolder(v);
     }
+
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
@@ -68,12 +65,12 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     }
 
     //ViewHolder Class
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
         TextView id, cost;
         ProgressBar progressBar;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             progressBar = (ProgressBar) itemView.findViewById(R.id.item_image_progress);
             image = (ImageView) itemView.findViewById(R.id.thumbnail);

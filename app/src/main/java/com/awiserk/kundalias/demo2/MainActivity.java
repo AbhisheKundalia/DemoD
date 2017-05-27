@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.awiserk.kundalias.demo2.data.DataProvider;
+import com.awiserk.kundalias.demo2.mFragments.FragListFirebase;
 import com.awiserk.kundalias.demo2.utils.CircleTransform;
 import com.awiserk.kundalias.demo2.mFragments.FragList;
 import com.bumptech.glide.Glide;
@@ -311,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
         switch (navItemIndex) {
             case 0:
                 // Category1
-                return FragList.newInstance(getString(R.string.category1));
+                return FragListFirebase.newInstance(getString(R.string.category1));
             case 1:
                 // Category2
                 return FragList.newInstance(getString(R.string.category2));

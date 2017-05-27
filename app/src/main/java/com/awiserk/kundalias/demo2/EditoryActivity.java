@@ -44,6 +44,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
@@ -57,7 +58,9 @@ import com.vansuita.pickimage.listeners.IPickResult;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
@@ -68,7 +71,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     // Firebase instance variables
     private static FirebaseDatabase mFirebaseDatabase;
     private static StorageReference mCatalogPhotosStorageReference;
-    private static DatabaseReference mCategoryDatabaseReference;
+    private static DatabaseReference mCategoryDatabaseReference, mItemDatabaseReference;
+    private HashMap<DatabaseReference, ValueEventListener> mListenerMap;
     // private FirebaseAuth mFirebaseAuth;
     // private FirebaseAuth.AuthStateListener mAuthStateListener;
     private static FirebaseStorage mFirebaseStorage;
@@ -859,6 +863,12 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
     /**
      * This method is called when the back button is pressed.
      */
@@ -908,9 +918,10 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
 
         DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
-        connectedRef.addValueEventListener(new ValueEventListener() {
+        connectedRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                Log.d("CONNECTEDREF", "On add value event listener data change!");
                 boolean connected = snapshot.getValue(Boolean.class);
                 if (connected) {
 
@@ -922,6 +933,14 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                     mCategoryDatabaseReference.child(item.getName()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
+                            mProgressBar = new ProgressDialog(EditoryActivity.this);
+                            mProgressBar.setTitle("Creating Item");
+                            mProgressBar.setMessage("Verifying item...");
+                            mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                            mProgressBar.setIndeterminate(true);
+                            mProgressBar.setProgress(0);
+                            mProgressBar.setCancelable(false);
+                            mProgressBar.show();
                             if (snapshot.exists()) {
                                 // TODO: handle the case where the data already exists
                                 AlertDialog.Builder builder = new AlertDialog.Builder(EditoryActivity.this);
@@ -943,15 +962,8 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
                             } else {
                                 // TODO: handle the case where the data does not yet exist
-
-
-                                mProgressBar = new ProgressDialog(EditoryActivity.this);
-                                mProgressBar.setTitle("Creating Item");
                                 mProgressBar.setMessage("Uploading...");
-                                mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                                mProgressBar.setIndeterminate(true);
-                                mProgressBar.setProgress(0);
-                                mProgressBar.show();
+                                //mProgressBar.show();
 
                                 final int[] currentprogress = new int[1];
                                 // Upload file to Firebase Storage
@@ -972,10 +984,14 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                                         // Set the download URL to the item Image, so that the user can send it to the database
                                         assert downloadUrl != null;
                                         item.setImageUrl(downloadUrl.toString());
-                                        mCategoryDatabaseReference.child(item.getName()).setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        mItemDatabaseReference = mCategoryDatabaseReference.child(item.getName());
+                                        mItemDatabaseReference.setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
+                                                //Set the Timestamp to order values
+                                                mItemDatabaseReference.child("timestamp").setValue(ServerValue.TIMESTAMP);
                                                 mProgressBar.setProgress((int) (currentprogress[0] * (5.0 / (100 - 5))));
+                                                mProgressBar.dismiss();
                                                 Toast.makeText(EditoryActivity.this, getString(R.string.record_created_success), Toast.LENGTH_SHORT).show();
                                                 NavUtils.navigateUpFromSameTask(EditoryActivity.this);
                                             }
@@ -996,6 +1012,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                                         mProgressBar.setMessage("Upload is paused");
                                     }
                                 });
+
 
 
                             }
