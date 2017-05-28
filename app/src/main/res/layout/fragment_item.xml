@@ -16,28 +16,29 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/thumbnail_layout">
-            <ImageView
-                android:id="@+id/thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/album_cover_height"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:scaleType="centerCrop"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/card_image_content_description" />
-
-            <ProgressBar
-                android:id="@+id/item_image_progress"
-                style="?android:attr/progressBarStyleSmall"
+            <RelativeLayout
+                android:id="@+id/thumbnail_layout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:visibility="gone"/>
-        </RelativeLayout>
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/album_cover_height"
+                    android:adjustViewBounds="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/card_image_content_description"
+                    android:scaleType="centerCrop" />
+
+                <ProgressBar
+                    android:id="@+id/item_image_progress"
+                    style="?android:attr/progressBarStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:visibility="gone" />
+            </RelativeLayout>
 
             <TextView
                 android:id="@+id/id"
@@ -47,29 +48,37 @@
                 android:paddingLeft="@dimen/album_title_padding"
                 android:paddingRight="@dimen/album_title_padding"
                 android:paddingTop="@dimen/album_title_padding"
-                android:textColor="@color/album_title"
+                android:textColor="#526cd0"
                 android:textSize="@dimen/album_title" />
 
-            <TextView
-                android:id="@+id/cost"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/id"
-                android:paddingBottom="@dimen/songs_count_padding_bottom"
-                android:paddingLeft="@dimen/album_title_padding"
-                android:paddingRight="@dimen/album_title_padding"
-                android:textSize="@dimen/songs_count" />
 
-            <ImageView
+
+            <RelativeLayout
                 android:id="@+id/overflow"
-                android:layout_width="@dimen/ic_album_overflow_width"
-                android:layout_height="@dimen/ic_album_overflow_height"
-                android:layout_alignParentRight="true"
-                android:layout_below="@id/thumbnail_layout"
-                android:layout_marginTop="@dimen/ic_album_overflow_margin_top"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_dots" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/id">
 
+                <TextView
+                    android:id="@+id/cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="@string/option_button_desc"
+                    android:paddingLeft="@dimen/album_title_padding"
+                    android:paddingRight="@dimen/album_title_padding"
+                    android:textColor="@color/tw__composer_black"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+            <TextView
+                android:id="@+id/size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/overflow"
+                android:layout_centerInParent="true"
+                android:padding="3dp"
+                android:textColor="@color/tw__composer_black"
+                android:textSize="12sp" />
         </RelativeLayout>
 
     </android.support.v7.widget.CardView>

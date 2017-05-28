@@ -4,16 +4,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import com.awiserk.kundalias.demo2.EndlessRecyclerOnScrollListener;
+import com.awiserk.kundalias.demo2.utils.EndlessRecyclerOnScrollListener;
 import com.awiserk.kundalias.demo2.MyItemRecyclerViewAdapter;
 import com.awiserk.kundalias.demo2.R;
 import com.awiserk.kundalias.demo2.data.Item;
@@ -24,16 +22,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static android.R.attr.data;
-import static android.R.id.list;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 /**
  * Created by Abhishek on 4/12/2017.

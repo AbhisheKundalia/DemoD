@@ -1,10 +1,7 @@
-package com.awiserk.kundalias.demo2;
+package com.awiserk.kundalias.demo2.utils;
 
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
-import com.awiserk.kundalias.demo2.utils.GridSpacingItemDecorator;
 
 
 public abstract class EndlessRecyclerOnScrollListener extends RecyclerView.OnScrollListener {

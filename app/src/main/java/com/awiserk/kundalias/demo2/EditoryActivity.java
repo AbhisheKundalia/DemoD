@@ -636,7 +636,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
         //check if single checkbox is selected
         for (int i = 0; i < arrayLength; i++) {
             if (cb[i].isChecked()) {
-                this.availableSizes.add(cb[i].getText().toString());
+                this.availableSizes.add(cb[i].getText().toString().toUpperCase());
             }
         }
         return this.availableSizes;//.toArray(new String[this.availableSizes.size()]);
@@ -666,7 +666,7 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
     private Item getCurrentFieldValues() {
         String category = mCategory;
         // Use trim to eliminate leading or trailing white space
-        String itemIdString = mItemIdEditText.getText().toString().trim();
+        String itemIdString = mItemIdEditText.getText().toString().trim().toUpperCase();
         Uri imageUrl = mImageUri;
         //Trims the visible commas of the price
         long itemPriceString = Long.valueOf(NumberTextWatcherForThousand.trimCommaOfString(mItemPriceEditText.getText().toString()).trim());

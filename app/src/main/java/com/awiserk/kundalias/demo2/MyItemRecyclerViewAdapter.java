@@ -1,8 +1,10 @@
 package com.awiserk.kundalias.demo2;
 
 import android.content.Context;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,21 +18,27 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
+
+import static android.R.id.list;
 
 public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder> {
 
-    private Context c;
+    private Context mContext;
     private List<Item> items;
 
-    public MyItemRecyclerViewAdapter(Context c, List<Item> items) {
-        this.c = c;
+    public MyItemRecyclerViewAdapter(Context mContext, List<Item> items) {
+        this.mContext = mContext;
         this.items = items;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(c).inflate(R.layout.fragment_item, parent, false);
+        View v = LayoutInflater.from(mContext).inflate(R.layout.fragment_item, parent, false);
         return new ViewHolder(v);
     }
 
@@ -38,7 +46,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
-        Glide.with(c).load(items.get(position).getImageUrl())
+        Glide.with(mContext).load(items.get(position).getImageUrl())
                 .listener(new RequestListener<String, GlideDrawable>() {
                     @Override
                     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
@@ -55,9 +63,16 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.image);
-        holder.cost.setText(c.getString(R.string.unit_item_price)+" "+items.get(position).getCost());
-        holder.id.setText(items.get(position).getName());
+        holder.cost.setText(mContext.getString(R.string.unit_item_price)+" "+items.get(position).getCost());
+        holder.id.setText(items.get(position).getName().toUpperCase());
+        holder.size.setText(mContext.getString(R.string.size_item_label)+" "+getDelimittedString(items.get(position).getAvailableSizes()).toUpperCase());
     }
+
+    private String getDelimittedString(List<String> availableSizes) {
+
+        return org.apache.commons.lang3.StringUtils.join(availableSizes,", ");
+    }
+
 
     @Override
     public int getItemCount() {
@@ -67,7 +82,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
     //ViewHolder Class
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView image;
-        TextView id, cost;
+        TextView id, cost, size;
         ProgressBar progressBar;
 
         ViewHolder(View itemView) {
@@ -76,6 +91,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
             image = (ImageView) itemView.findViewById(R.id.thumbnail);
             id = (TextView) itemView.findViewById(R.id.id);
             cost = (TextView) itemView.findViewById(R.id.cost);
+            size = (TextView) itemView.findViewById(R.id.size);
         }
     }
 }
