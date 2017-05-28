@@ -13,14 +13,17 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.awiserk.kundalias.demo2.EndlessRecyclerOnScrollListener;
 import com.awiserk.kundalias.demo2.MyItemRecyclerViewAdapter;
 import com.awiserk.kundalias.demo2.R;
 import com.awiserk.kundalias.demo2.data.Item;
 import com.awiserk.kundalias.demo2.utils.GridSpacingItemDecorator;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
@@ -28,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static android.R.attr.data;
+import static android.R.id.list;
 import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 /**
@@ -47,6 +52,9 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
     private int currentPage = 0;
     private ProgressBar mProgressBar;
     private RecyclerView recyclerView;
+    private static final long INITTIME = 240;
+    private long timestamp = INITTIME;
+    public long ptimestamp = timestamp;
 
     public FragListFirebase() {
         super();
@@ -76,7 +84,7 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
         this.v = view;
         init();
         mProgressBar.setVisibility(View.VISIBLE);
-        loadData(mCategory);
+        loadDataController();
     }
 
     private void init()
@@ -99,80 +107,166 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
 
         //Adapter
         rv.setAdapter(mAdapter);
-        /*rv.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager) {
+        rv.addOnScrollListener(new EndlessRecyclerOnScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int current_page) {
-                loadMoreData(mCategory);
+                loadMoreData();
             }
-        });*/
+        });
 
     }
 
-    private void loadData(String category) {
+    private void loadDataController() {
         mDatabase = FirebaseDatabase.getInstance().getReference().child("catalog").child(mCategory);
         /*
         .limitToFirst(TOTAL_ITEM_EACH_LOAD)
                 .startAt(currentPage * TOTAL_ITEM_EACH_LOAD)
          */
-        mDatabase.limitToLast(TOTAL_ITEM_EACH_LOAD)
-                .orderByChild("timestamp")
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                    Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
-                                    Log.d(TAG, "Value is: " + newPost);
-                        if (!dataSnapshot.hasChildren()) {
-                            Toast.makeText(getContext(), "You have reached the End!", Toast.LENGTH_SHORT).show();
-                            currentPage--;
-                        }
-                        for (DataSnapshot data : dataSnapshot.getChildren()) {
-
-                            Log.d(TAG, "Value is: " + data);
-                            Item item = data.getValue(Item.class);
-                            Log.d(TAG, "ITEM is: " + item);
-                            itemList.add(item);
-                            mAdapter.notifyDataSetChanged();
-                        }
-                        mProgressBar.setVisibility(RecyclerView.GONE);
-                    }
-
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        mProgressBar.setVisibility(RecyclerView.GONE);
-                    }
-                });
-
-        // Read from the database
-       /* mDatabase.limitToLast(2).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-//                String value = dataSnapshot.getValue(String.class);
-                Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
-
-                Log.d(TAG, "Value is: " + newPost);
-                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                    Log.d(TAG, "Value is: " + data);
-                    Item item = data.getValue(Item.class);
-                    Log.d(TAG, "ITEM is: " + item);
-                    itemList.add(item);
-                    mAdapter.notifyDataSetChanged();
+        if(timestamp == INITTIME)
+        {
+            mDatabase.getRoot().child("timestamp").child(mCategory).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    timestamp = Long.parseLong(dataSnapshot.getValue().toString());
+                    Log.d("TIMESTAMP1", timestamp+"");
+                    loadData();
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w(TAG, "Failed to read value.", error.toException());
-            }
-        });*/
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+        else
+        {
+            loadData();
+        }
     }
 
-    private void loadMoreData(String category) {
-        currentPage++;
-        loadData(category);
+    private void loadData() {
+        mDatabase = FirebaseDatabase.getInstance().getReference().child("catalog").child(mCategory);
+        if(timestamp != INITTIME)
+        {
+            Query query = mDatabase.limitToFirst(TOTAL_ITEM_EACH_LOAD)
+                    .startAt(timestamp)
+                    .orderByChild("timestamp");
+            Log.d("TIMESTAMP2", timestamp+"");
+            // Read from the database
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        //Toast.makeText(getContext(), "You have reached the End!", Toast.LENGTH_SHORT).show();
+                    if(mProgressBar.getVisibility() == View.VISIBLE)
+                    {
+                        mProgressBar.setVisibility(RecyclerView.GONE);
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+                    query.addChildEventListener(new ChildEventListener() {
+                        public boolean removed = false;
+
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            if(!removed)
+                            {
+                               /* Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
+                                Log.d(TAG, "Value is: " + newPost);
+                                */
+                               if(mProgressBar.getVisibility() != View.VISIBLE)
+                                {
+                                    mProgressBar.setVisibility(View.VISIBLE);
+                                }
+                                //Log.d(TAG, "Value is: " + data);
+                                Item item = dataSnapshot.getValue(Item.class);
+                                //timestamp = item.getTimestamp();
+                                //Log.d(TAG, "\nITEM is: " + item.getTimestamp());
+                                itemList.add(item);
+                                mAdapter.notifyDataSetChanged();
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            Item item = dataSnapshot.getValue(Item.class);
+                            for (Item object : itemList) {
+                                if (object.getName().equals(item.getName())) {
+                                    itemList.set(itemList.indexOf(object), item);
+                                    mAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                            Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
+                            Log.d(TAG, "Removed is: " + newPost);
+                            removed =true;
+                            Item item = dataSnapshot.getValue(Item.class);
+                            for (Item object : itemList) {
+                                if (object.getName().equals(item.getName())) {
+                                    itemList.remove(itemList.indexOf(object));
+                                    mAdapter.notifyDataSetChanged();
+                                    break;
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });/*
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
+                            Log.d(TAG, "Value is: " + newPost);
+                            if (!dataSnapshot.hasChildren()) {
+                                Toast.makeText(getContext(), "You have reached the End!", Toast.LENGTH_SHORT).show();
+                                currentPage--;
+                            }
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+
+                                //Log.d(TAG, "Value is: " + data);
+                                Item item = data.getValue(Item.class);
+                                //timestamp = item.getTimestamp();
+                                //Log.d(TAG, "\nITEM is: " + item.getTimestamp());
+                                itemList.add(item);
+                                mAdapter.notifyDataSetChanged();
+                            }
+                            mProgressBar.setVisibility(RecyclerView.GONE);
+                        }
+
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            mProgressBar.setVisibility(RecyclerView.GONE);
+                        }
+                    });*/
+        }
+
+    }
+
+    private void loadMoreData() {
+        timestamp = itemList.get(itemList.size() - 1).getTimestamp() + 1;
+        loadDataController();
         mProgressBar.setVisibility(RecyclerView.VISIBLE);
     }
 

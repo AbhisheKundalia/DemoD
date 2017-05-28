@@ -62,6 +62,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.R.attr.data;
+import static java.lang.Long.parseLong;
+
 
 public class EditoryActivity extends AppCompatActivity implements IPickResult {
 
@@ -923,25 +926,37 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("CONNECTEDREF", "On add value event listener data change!");
                 boolean connected = snapshot.getValue(Boolean.class);
+                mItemDatabaseReference = mCategoryDatabaseReference.push();
                 if (connected) {
 
                     if (snackbar.isShown()) {
                         snackbar.setText("Connected");
                         snackbar.dismiss();
                     }
+                    mProgressBar = new ProgressDialog(EditoryActivity.this);
+                    mProgressBar.setTitle("Creating Item");
+                    mProgressBar.setMessage("Verifying item...");
+                    mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                    mProgressBar.setIndeterminate(true);
+                    mProgressBar.setProgress(0);
+                    mProgressBar.setCancelable(false);
+                    mProgressBar.show();
 
-                    mCategoryDatabaseReference.child(item.getName()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        mCategoryDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                boolean exists = false;
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
-                            mProgressBar = new ProgressDialog(EditoryActivity.this);
-                            mProgressBar.setTitle("Creating Item");
-                            mProgressBar.setMessage("Verifying item...");
-                            mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                            mProgressBar.setIndeterminate(true);
-                            mProgressBar.setProgress(0);
-                            mProgressBar.setCancelable(false);
-                            mProgressBar.show();
-                            if (snapshot.exists()) {
+                            Map<String, Object> newPost = (Map<String, Object>) snapshot.getValue();
+                            Log.d("EXISTS", "Value is: " + newPost);
+                         for(DataSnapshot data: snapshot.getChildren()){
+                                if (data.child("name").getValue().equals(item.getName())) {
+                                    //do ur stuff
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                            if (exists) {
+                                mProgressBar.dismiss();
                                 // TODO: handle the case where the data already exists
                                 AlertDialog.Builder builder = new AlertDialog.Builder(EditoryActivity.this);
                                 builder.setMessage(String.format(getResources().getString(R.string.id_already_exist_error), item.getName()));
@@ -984,16 +999,38 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                                         // Set the download URL to the item Image, so that the user can send it to the database
                                         assert downloadUrl != null;
                                         item.setImageUrl(downloadUrl.toString());
-                                        mItemDatabaseReference = mCategoryDatabaseReference.child(item.getName());
+
                                         mItemDatabaseReference.setValue(item).addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
                                                 //Set the Timestamp to order values
-                                                mItemDatabaseReference.child("timestamp").setValue(ServerValue.TIMESTAMP);
-                                                mProgressBar.setProgress((int) (currentprogress[0] * (5.0 / (100 - 5))));
-                                                mProgressBar.dismiss();
-                                                Toast.makeText(EditoryActivity.this, getString(R.string.record_created_success), Toast.LENGTH_SHORT).show();
-                                                NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                                                mItemDatabaseReference.child("timestamp").setValue(ServerValue.TIMESTAMP).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                    @Override
+                                                    public void onSuccess(Void aVoid) {
+                                                        mCategoryDatabaseReference.child(mItemDatabaseReference.getKey()).child("timestamp").addListenerForSingleValueEvent(new ValueEventListener() {
+                                                            @Override
+                                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                                long time = Long.parseLong(dataSnapshot.getValue().toString());
+                                                                time = -time;
+                                                                mCategoryDatabaseReference.getRoot().child("timestamp").child(mCategory).setValue(time);
+                                                                mItemDatabaseReference.child("timestamp").setValue(time).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                    @Override
+                                                                    public void onSuccess(Void aVoid) {
+                                                                        mProgressBar.setProgress((int) (currentprogress[0] * (5.0 / (100 - 5))));
+                                                                        mProgressBar.dismiss();
+                                                                        Toast.makeText(EditoryActivity.this, getString(R.string.record_created_success), Toast.LENGTH_SHORT).show();
+                                                                        NavUtils.navigateUpFromSameTask(EditoryActivity.this);
+                                                                    }
+                                                                });
+                                                            }
+
+                                                            @Override
+                                                            public void onCancelled(DatabaseError databaseError) {
+
+                                                            }
+                                                        });
+                                                    }
+                                                });
                                             }
                                         });
                                     }
@@ -1026,7 +1063,11 @@ public class EditoryActivity extends AppCompatActivity implements IPickResult {
                     });
 
                 } else {
-
+                    if(mProgressBar!= null && mProgressBar.isShowing())
+                    {
+                        mProgressBar.setMessage("No Internet");
+                        mProgressBar.dismiss();
+                    }
                     snackbar.show();
                     Log.i("Disconnected!", "YES");
                 }
