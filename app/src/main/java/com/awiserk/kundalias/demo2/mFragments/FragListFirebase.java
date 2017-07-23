@@ -23,6 +23,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
     private MyItemRecyclerViewAdapter mAdapter;
     private int currentPage = 0;
     private ProgressBar mProgressBar;
+    private AVLoadingIndicatorView mAnimationProgress;
     private RecyclerView recyclerView;
     private static final long INITTIME = 240;
     private long timestamp = INITTIME;
@@ -76,7 +78,8 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
         super.onViewCreated(view, savedInstanceState);
         this.v = view;
         init();
-        mProgressBar.setVisibility(View.VISIBLE);
+        //mProgressBar.setVisibility(View.VISIBLE);
+        mAnimationProgress.smoothToShow();
         loadDataController();
     }
 
@@ -84,8 +87,8 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
     {
         //Reference
         rv = (RecyclerView) v.findViewById(R.id.list_rv);
-        mProgressBar = (ProgressBar) v.findViewById(R.id.progressbarloading);
-
+        //mProgressBar = (ProgressBar) v.findViewById(R.id.progressbarloading);
+        mAnimationProgress = (AVLoadingIndicatorView) v.findViewById(R.id.progressbarloadingC) ;
 
         //Layout Manager to display items in reverse order i.e. newest first
         GridLayoutManager mLayoutManager = new GridLayoutManager(this.getActivity(), GridSpacingItemDecorator.calculateNoOfColumns(this.getActivity()));
@@ -151,9 +154,9 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
                         //Toast.makeText(getContext(), "You have reached the End!", Toast.LENGTH_SHORT).show();
-                    if(mProgressBar.getVisibility() == View.VISIBLE)
+                    if(mAnimationProgress.getVisibility() == View.VISIBLE)
                     {
-                        mProgressBar.setVisibility(RecyclerView.GONE);
+                        mAnimationProgress.smoothToHide();
                     }
 
                 }
@@ -174,9 +177,9 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
                                /* Map<String, Object> newPost = (Map<String, Object>) dataSnapshot.getValue();
                                 Log.d(TAG, "Value is: " + newPost);
                                 */
-                               if(mProgressBar.getVisibility() != View.VISIBLE)
+                               if(mAnimationProgress.getVisibility() != View.VISIBLE)
                                 {
-                                    mProgressBar.setVisibility(View.VISIBLE);
+                                    mAnimationProgress.smoothToShow();
                                 }
                                 //Log.d(TAG, "Value is: " + data);
                                 Item item = dataSnapshot.getValue(Item.class);
@@ -260,7 +263,8 @@ public class FragListFirebase extends android.support.v4.app.Fragment{
     private void loadMoreData() {
         timestamp = itemList.get(itemList.size() - 1).getTimestamp() + 1;
         loadDataController();
-        mProgressBar.setVisibility(RecyclerView.VISIBLE);
+        mAnimationProgress.smoothToShow();
+        //mProgressBar.setVisibility(RecyclerView.VISIBLE);
     }
 
 }

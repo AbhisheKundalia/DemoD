@@ -13,6 +13,16 @@
     app:layoutManager="GridLayoutManager"
     tools:context="com.awiserk.kundalias.demo2.ItemFragment"
     tools:listitem="@layout/fragment_item" />
+    <com.wang.avi.AVLoadingIndicatorView
+        android:id="@+id/progressbarloadingC"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:indicatorName="BallClipRotateMultipleIndicator"
+        app:indicatorColor="@color/tw__composer_black"
+        />
     <ProgressBar
         android:id="@+id/progressbarloading"
         android:layout_width="wrap_content"
